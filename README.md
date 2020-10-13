@@ -1,15 +1,15 @@
 # DatosMEx
-Librería general para manejar bases de datos abiertas en México en python.
-Actualmente se está desarrollando un módulo para los datos del Banco de Información Económica del INEGI y para el Sistema de Información Económica de Banxico.
+Librería general para el manejo de bases de datos abiertas en python.
+Actualmente se está desarrollando un módulo para los datos del Banco de Información Económica (BIE) del INEGI y para el Sistema de Información Económica (SIE) de Banxico.
 
 ## INEGIpy
 Librería de Python para interactuar con el API del INEGI.
 
 #### Módulos en desarrollo:
-Además de un método general para obtener las series, se están desarrollando módulos particulares para los datos económicos de uso común.
-Markup : * PIB
-         * Inflación
-         * Desocupación
+Además de un método general para obtener las series, se están desarrollando módulos particulares para los series de uso común, como:
+* PIB
+* Inflación
+* Desocupación
 
 ### Uso:
 ```python
