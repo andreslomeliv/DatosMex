@@ -6,6 +6,10 @@ class BanxicoGeneral:
         self.__fin = None
         self.__indicadores = []
 
+    def definir_indicadores(self, indicadores):
+        self.__indicadores = indicadores
+        return self
+
     def indicadores_a_df(self):
         dfs = []
         for indicador in self.__indicadores:
