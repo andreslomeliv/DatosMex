@@ -20,12 +20,6 @@ class Total(PIB_General):
                              'trimestral original':['493717','BIE'],
                              'trimestral acumulada':['493765','BIE']}}
         self.definir_serie(['real', 'anual'])
-
-    def pib_df(self):  ######## checar bien cuánto puedo escribir en pib_general, probablemente puedo hacer 
-        df = super().pib_df() #### todo ahí mismo
-        df.columns = ['PIB']
-        self._df = df
-        return df
  
     def grafica(self, show = True, filename = None):
         if self._df is None:

@@ -77,8 +77,20 @@ class INEGI_General:
         df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
         df = df.drop(['fechas'],axis=1)
         return df
+
+    def __pretty_printer(self, dictionary, indent = 0):
+        for key, value in dictionary.items():
+            print('\t'*indent + key)
+            if type(value) is dict:
+                self.__pretty_printer(value, indent+2)
+
     
     ###### MÉTODOS GENERALES ######
+    def series_disponibles(self):
+        """
+        Regresa los niveles de series disponibles en cada clase. 
+        """
+        self.__pretty_printer(self._indicadores_dict)
 
     def obtener_df(self):
         """ 
@@ -100,15 +112,8 @@ class INEGI_General:
         
             df = pd.concat(lista_df,axis=1)
             if self._bancos == ['BIE']: df = df[::-1]
-            self._df = df[self.inicio:self.fin]   
-        return self._df
-
-    def series_disponibles(self):
-        """
-        Regresa los niveles de series disponibles en cada clase. 
-        """
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(self._indicadores_dict)
+            self._df = df
+        return self._df[self.inicio:self.fin]   
 
 #################################################################################
 # Considerando si borrar estos métodos y solo hacerlos accesibles a través de los
@@ -127,7 +132,6 @@ class INEGI_General:
         """
         self.inicio = inicio
         self.fin = fin
-        if self._df: self._df[inicio:fin]
         return self
 
     def serie_actual(self):
@@ -135,8 +139,8 @@ class INEGI_General:
 
     def definir_serie(self, serie):
         """
-        serie -- list. [valor, tipo de serie], ejemplo: ['real','trimestral desestacionalizada']. Para ver las 
-        series disponibles ver self.series_disponibles()
+        serie -- lista con los niveles de información de la serie a obtener. 
+        Para mayor información ver self.series_disponilbes
         """
         self.serie = serie
         return 
