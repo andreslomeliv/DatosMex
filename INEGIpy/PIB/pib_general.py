@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
 import sys
 from pathlib import Path
 
@@ -12,11 +14,22 @@ class PIB_General(INEGI_General):
     def __init__(self, token):
         super().__init__(token)
 
-    #def grafica_minimalistas(self):
-    #    df = self.pib_df()
-    #    fig,ax = plt.subplots()
-    #    sns.set_palette('gray')
-     #   sns.lineplot(data=df)
-      #  sns.despine()
-       # ax.set_xlabel('')
-        #ax.ticklabel_format(style='plain',axis='y')
+################################################################################
+# arreglar marcadores
+################################################################################
+    def _cambiar_lineas(self, ax, estilo):
+        if estilo == 'colores':
+            self.__cambiar_colores(ax)
+        if estilo == 'blanco y negro':
+            self.__cambiar_estilos(ax)
+        ax.legend(self._columnas)
+
+    def __cambiar_estilos(self, ax):
+        ls = ['--','-.','-']
+        for i, line in enumerate(ax.get_lines()):
+            line.set_linestyle(ls[i])
+
+    def __cambiar_colores(self, ax):
+        palette = sns.color_palette('colorblind',3)[::-1]
+        for i, line in enumerate(ax.get_lines()):
+            line.set_color(palette[i])
