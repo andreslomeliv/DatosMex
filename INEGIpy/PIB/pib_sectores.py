@@ -1,7 +1,7 @@
 from pib_general import PIB_General
 import pandas as pd
-
-token = '92170321-528f-f1dd-5d59-f8613e072746' ###borrar
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 class PorSectores(PIB_General):
 
@@ -16,32 +16,28 @@ class PorSectores(PIB_General):
                                     {'primario':['493624','BIE'],
                                      'secundario':['493625','BIE'],
                                      'terciario':['493630','BIE']}}}
-        self.__sectores = []
+        self.sectores = []
         self.definir_sectores(['primario','secundario','terciario'])
         self.definir_serie(['real','trimestral desestacionalizada'])
-
-    def pib_df(self):
-        df = super().pib_df()
-        df.columns = ['PIB ' + s for s in self.__sectores]
-        self._df = df
-        return df
+        self._columnas = ['PIB ' + sector for sector in self.sectores]
 
     def definir_serie(self, serie):
         super().definir_serie(serie)
         valores = serie[0]
         serie = serie[1]
         self._indicadores = [self._indicadores_dict[valores][serie][sector][0] 
-                              for sector in self.__sectores]
+                              for sector in self.sectores]
         self._bancos = [self._indicadores_dict[valores][serie][sector][1] for sector
-                         in self.__sectores]
+                         in self.sectores]
         return self  
 
     def definir_sectores(self, sectores):
-        self.__sectores = sectores
+        self.sectores = sectores
         return self
 
     def sectores_actuales(self):
-        return self.__sectores
+        return self.sectores
 
-    def prueba_indicadores(self):
-        return self._indicadores
+
+################################################################################################
+

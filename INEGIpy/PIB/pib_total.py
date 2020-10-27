@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
-token = '92170321-528f-f1dd-5d59-f8613e072746'
-
 class Total(PIB_General):
              
     def __init__(self, token):
@@ -20,21 +18,7 @@ class Total(PIB_General):
                              'trimestral original':['493717','BIE'],
                              'trimestral acumulada':['493765','BIE']}}
         self.definir_serie(['real', 'anual'])
- 
-    def grafica(self, show = True, filename = None):
-        if self._df is None:
-            self.pib_df()
-        fig, ax = plt.subplots()
-        self._df.plot(ax=ax,color='black')
-        sns.despine()
-        ax.set_xlabel('')
-        ax.legend().remove()
-        ax.ticklabel_format(style='plain',axis='y')
-        plt.tight_layout()
-        
-        if show: plt.show()
-        #if filename: plt.savefig(filename) revisar pedos con la ruta
-        return fig, ax
+        self._columnas = ['PIB']
     
     def definir_serie(self, serie):
         super().definir_serie(serie)
