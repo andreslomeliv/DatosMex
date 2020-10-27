@@ -1,5 +1,6 @@
 import pandas as pd
-import pprint
+import matplotlib.pyplot as plt
+import seaborn as sns
 import requests
 import json
 
@@ -9,12 +10,13 @@ class INEGI_General:
         self.token = token
         self.__liga_base = 'https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/'
         self._indicadores_dict = {}
-        self._indicadores = None
+        self._indicadores = []
         self._bancos = None
         self.inicio = None
         self.fin = None
         self.serie = []
         self._df = None
+        self._columnas = []
         
     ##### MÉTODOS INTERNOS #####
 
@@ -51,7 +53,7 @@ class INEGI_General:
         data = json.loads(req.text)
         return data
     
-    def __json_a_df(self, data, indicador):
+    def __json_a_df(self, data):
         """ 
         
         Construye un DataFrame con la información resultante del API del INEGI de 
@@ -72,13 +74,29 @@ class INEGI_General:
         """
         obs_totales = len(data['Series'][0]['OBSERVATIONS'])
         dic = {'fechas':[data['Series'][0]['OBSERVATIONS'][i]['TIME_PERIOD'] for i in range(obs_totales)],
-                indicador:[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) for i in range(obs_totales)]}
+                'valor':[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) for i in range(obs_totales)]}
         df = pd.DataFrame.from_dict(dic)
         df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
         df = df.drop(['fechas'],axis=1)
         return df
+
+    def __pretty_printer(self, dictionary, niveles = None):
+        indent = 0
+        for key, value in dictionary.items():
+            print('\t'*indent + key)
+            if type(value) is dict:
+                self.__pretty_printer(value, indent+2)
+
+    def _cambiar_lineas(self, ax, estilo):
+        pass
+
     
     ###### MÉTODOS GENERALES ######
+    def series_disponibles(self):
+        """
+        Regresa los niveles de series disponibles en cada clase. 
+        """
+        self.__pretty_printer(self._indicadores_dict)
 
     def obtener_df(self):
         """ 
@@ -88,27 +106,55 @@ class INEGI_General:
     
         """
         if self._df is None:
-            lista_df = []
             
+            lista_df = []
             for i in range(len(self._indicadores)):
                 indicador = self._indicadores[i]
                 banco = self._bancos[i]
                 data = self.__obtener_json(indicador, banco)
-                df = self.__json_a_df(data, indicador)
-                df.columns = [indicador]
+                df = self.__json_a_df(data)
                 lista_df.append(df)
         
             df = pd.concat(lista_df,axis=1)
+            df.columns = self._columnas
             if self._bancos == ['BIE']: df = df[::-1]
-            self._df = df[self.inicio:self.fin]   
-        return self._df
+            self._df = df
+        return self._df[self.inicio:self.fin]   
 
-    def series_disponibles(self):
+        
+    def grafica(self, estilo = 'colores', show = True, filename = None):
         """
-        Regresa los niveles de series disponibles en cada clase. 
+        Regresa los objetos fig y ax de matplotlib con la gráfica generada. 
+
+        Esta función no pretende remplazar el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar
+        estilos de gráficas que puedan ser de uso común. Por ello, la gráfica generada tiene solo ciertos estilos disponibles. 
+        Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas
+        directamente con los datos o para manipular los objetos fig y ax que regresa esta función. 
+
+        Parámetros
+        -----------
+        estilo -- str. ACEPTA: ['colores' (default) | 'blanco y negro']. Estilo de la gráfica. Actualmente solo existen 
+        dos estilos: 'colores' y 'blanco y negro'.
+        show -- bool. Define si mostrar o no la gráfica. Equivalente a plt.show()
+        filename -- nombre y dirección donde guardar la gráfica. Equivalente a plt.savefig()
+        -----------
         """
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(self._indicadores_dict)
+        if self._df is None:
+            self.obtener_df()
+        color = 'blue' if estilo == 'colores' else 'black'
+        fig, ax = plt.subplots()
+        self._df.plot(ax=ax,color=color)
+        ax.legend().remove()
+        if len(self._df.columns)>1: self._cambiar_lineas(ax, estilo)
+        sns.despine()
+        ax.set_xlabel('')
+        ax.ticklabel_format(style='plain',axis='y')
+        plt.tight_layout()
+        
+        if show: plt.show()
+        if filename: plt.savefig(filename)
+        return fig, ax
+
 
 #################################################################################
 # Considerando si borrar estos métodos y solo hacerlos accesibles a través de los
@@ -127,7 +173,6 @@ class INEGI_General:
         """
         self.inicio = inicio
         self.fin = fin
-        if self._df: self._df[inicio:fin]
         return self
 
     def serie_actual(self):
@@ -135,8 +180,8 @@ class INEGI_General:
 
     def definir_serie(self, serie):
         """
-        serie -- list. [valor, tipo de serie], ejemplo: ['real','trimestral desestacionalizada']. Para ver las 
-        series disponibles ver self.series_disponibles()
+        serie -- lista con los niveles de información de la serie a obtener. 
+        Para mayor información ver self.series_disponilbes
         """
         self.serie = serie
         return 
