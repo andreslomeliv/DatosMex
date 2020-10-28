@@ -47,9 +47,7 @@ class INEGI_General:
         banco = banco + '/2.0/'
         final_liga = str(self.token) + '?type=json'
         liga_api = self.__liga_base + indicador + idioma + '0700/false/' + banco + final_liga
-        print(liga_api)
         req = requests.get(liga_api)
-        print(req)
         data = json.loads(req.text)
         return data
     
@@ -87,9 +85,31 @@ class INEGI_General:
             if type(value) is dict:
                 self.__pretty_printer(value, indent+2)
 
-    def _cambiar_lineas(self, ax, estilo):
-        pass
+    def __grafica_color(self, df):
+        fig, ax = plt.subplots()
+        cols = df.columns
+        n = len(cols)
+        palette = sns.color_palette('colorblind')
+        for i in range(n):
+            serie = df[cols[i]]
+            serie.plot(c = palette[i], ax = ax)
+        
+        if n == 1: ax.legend().remove()
+        return fig, ax
 
+    def __grafica_blanco_negro(self, df):
+        fig, ax = plt.subplots()
+        cols = df.columns
+        n = len(cols)
+        linestyles = ['-','--','-.',':']
+        marcadores = ['s','v','o','p','h','D']
+        for i in range(n):
+            serie = df[cols[i]]
+            if i < 4: serie.plot(c = 'black', style = linestyles[i], ax = ax)
+            else: serie.plot(c = 'black', marker= marcadores[i], ax = ax)
+        
+        if n == 1: ax.legend().remove()
+        return fig, ax
     
     ###### MÉTODOS GENERALES ######
     def series_disponibles(self):
@@ -119,14 +139,14 @@ class INEGI_General:
             df.columns = self._columnas
             if self._bancos == ['BIE']: df = df[::-1]
             self._df = df
-        return self._df[self.inicio:self.fin]   
+        return self._df[self.inicio: self.fin]   
 
         
-    def grafica(self, estilo = 'colores', show = True, filename = None):
+    def grafica(self, estilo = 'color', show = True, filename = None):
         """
         Regresa los objetos fig y ax de matplotlib con la gráfica generada. 
 
-        Esta función no pretende remplazar el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar
+        Esta función no pretende remplazaroo el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar
         estilos de gráficas que puedan ser de uso común. Por ello, la gráfica generada tiene solo ciertos estilos disponibles. 
         Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas
         directamente con los datos o para manipular los objetos fig y ax que regresa esta función. 
@@ -141,11 +161,8 @@ class INEGI_General:
         """
         if self._df is None:
             self.obtener_df()
-        color = 'blue' if estilo == 'colores' else 'black'
-        fig, ax = plt.subplots()
-        self._df.plot(ax=ax,color=color)
-        ax.legend().remove()
-        if len(self._df.columns)>1: self._cambiar_lineas(ax, estilo)
+        if estilo == 'color': fig, ax = self.__grafica_color(self._df)
+        if estilo == 'blanco y negro': fig, ax = self.__grafica_blanco_negro(self._df)
         sns.despine()
         ax.set_xlabel('')
         ax.ticklabel_format(style='plain',axis='y')

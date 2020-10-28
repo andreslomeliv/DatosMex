@@ -17,8 +17,8 @@ class PorSectores(PIB_General):
                                      'secundario':['493625','BIE'],
                                      'terciario':['493630','BIE']}}}
         self.sectores = []
-        self.definir_sectores(['primario','secundario','terciario'])
-        self.definir_serie(['real','trimestral desestacionalizada'])
+        self.definir_sectores(['terciario', 'secundario', 'primario'])
+        self.definir_serie(['real', 'trimestral desestacionalizada'])
         self._columnas = ['PIB ' + sector for sector in self.sectores]
 
     def definir_serie(self, serie):
