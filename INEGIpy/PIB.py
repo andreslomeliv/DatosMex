@@ -1,4 +1,4 @@
-
+# Contiene los objetos particulares del PIB, no tiene nada de código particular +
 import sys
 from pathlib import Path
 

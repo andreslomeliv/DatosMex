@@ -38,6 +38,11 @@ class PorSectores(PIB_General):
     def sectores_actuales(self):
         return self.sectores
 
+    ### ver bien la mejor forma de usar **kwargs. Tal vez conviene pasar todo a Serie_General o INEGI_General
+    ### también cómo llamar a las variables de mejor manera
+    def obtener_df(self, **kwargs):
+        if 'sectores' in kwargs.keys(): self.definir_sectores(kwargs['sectores'])
+        return super().obtener_df()
 
 ################################################################################################
 
