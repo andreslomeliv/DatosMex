@@ -10,8 +10,8 @@ Una clase general para acceder a los indicadores proporcionados por el construct
 * IndicadorGeneral
 Además de un método general para obtener las series, se están desarrollando módulos particulares para los series de uso común, como:
 * PIB
-  ** Sub Total
-  ** Sub PorSectores
+  * Sub Total
+  * Sub PorSectores
 * Inflación
 * Desocupación
 
