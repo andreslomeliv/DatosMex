@@ -1,4 +1,4 @@
-## PEDOS
+## Problemas
 # self.__pretty_printer() no ha funcionado como debe por alguna razón, vale la pena checar bien cuál es la
 # mejor manera de presentar en lan terminal las series disponibles en cada clase
 

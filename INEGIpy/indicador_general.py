@@ -1,8 +1,7 @@
 ##################################################################
-######### PEDOSPEDOSPEDOSPEDOS
+######### Problemas
 ###################################################################3333333
-# No debe volver a hacer requests al api si no se cambiaron los indicadores
-## ni cada vez que se llame la función grafica()
+# no cambia la gráfica la gráfica cuando se redefinen los años
 
 from inegi_general import INEGI_General
 
@@ -41,8 +40,6 @@ class IndicadorGeneral(INEGI_General):
             if key == 'indicadores': self.definir_indicadores(value)
             if key == 'bancos': self.definir_bancos(value)
             if key == 'nombres': self.definir_nombres(value)
-            if key == 'inicio': self.inicio = value
-            if key == 'fin': self.fin = value
         return super().obtener_df()
 
     
