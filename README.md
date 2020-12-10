@@ -8,7 +8,9 @@ Librería de Python para interactuar con el API del INEGI.
 #### Clases en desarrollo:
 Una clase general para acceder a los indicadores proporcionados por el constructor de consultas del INEGI
 * IndicadorGeneral
+
 Además de un método general para obtener las series, se están desarrollando módulos particulares para los series de uso común, como:
+
 * PIB
   * Total
   * PorSectores
