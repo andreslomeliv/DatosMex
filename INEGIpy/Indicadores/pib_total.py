@@ -18,7 +18,7 @@ class Total(PIB_General):
                              'trimestral original':['493717','BIE'],
                              'trimestral acumulada':['493765','BIE']}}
         self.definir_serie(['real', 'anual'])
-        self._columnas = ['PIB']
+        
     
     def definir_serie(self, serie):
         super().definir_serie(serie)

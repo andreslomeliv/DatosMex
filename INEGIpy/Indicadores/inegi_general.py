@@ -9,14 +9,13 @@ class INEGI_General:
     def __init__(self, token):
         self.token = token
         self.__liga_base = 'https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/'
-        self._indicadores_dict = {}
-        self._indicadores = []
-        self._bancos = None
+        self._indicadores_dict = dict()
+        self._indicadores = list()
+        self._bancos = list()
         self.inicio = None
         self.fin = None
-        self.serie = []
         self._df = None
-        self._columnas = []
+        self._columnas = list()
         
     ##### MÉTODOS INTERNOS #####
 
