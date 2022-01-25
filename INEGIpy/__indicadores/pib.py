@@ -1,11 +1,6 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
-#import sys
-#from pathlib import Path
-
-#HERE = Path(__file__).parent
-
-#sys.path.append(str(HERE / '../../INEGIpy'))
+# Notas: a veces se vuelve a llamar al API aunque no cambiaron los indicadores, generalmente lo hace la primera
+# vez después de haber llamado al df
+# se tiene que agregar las opciones disponibles y errores cuando se pida una serie que no exista
 
 from .serie_general import Serie_General
 
@@ -15,7 +10,6 @@ class PIB(Serie_General):
         super().__init__(token)
         self.serie = 'trimestral desestacionalizada'
         self.valores = 'real'
-        self.periodo = (None, None)
         self.sectores = 'total'
         self._columnas = ['PIB total']
         self._indicadores_dict = {'trimestral desestacionalizada':
@@ -46,7 +40,7 @@ class PIB(Serie_General):
                                         {'total': 
                                             {'real':('493669','BIE'),
                                              'nominal':('493765','BIE')}}}
-        self.consulta = None
+        #self.consulta = None
         
     def _obtener_indicadores(self):
         super()._obtener_indicadores()
@@ -65,27 +59,11 @@ class PIB(Serie_General):
 
     def obtener_df(self, **kwargs):
         for key, value in kwargs.items():
-            if key == 'sectores': self.sectores = value
+            if key == 'sectores': self.sectores = value   
             if key == 'valores': self.valores = value
-        self._obtener_indicadores()
-        return super().obtener_df()
+                
+        kwargs.pop('sectores', None)
+        kwargs.pop('valores', None)
 
-################################################################################
-# arreglar marcadores
-################################################################################
-    def _cambiar_lineas(self, ax, estilo):
-        if estilo == 'colores':
-            self.__cambiar_colores(ax)
-        if estilo == 'blanco y negro':
-            self.__cambiar_estilos(ax)
-        ax.legend(self._columnas)
-
-    def __cambiar_estilos(self, ax):
-        ls = ['--','-.','-']
-        for i, line in enumerate(ax.get_lines()):
-            line.set_linestyle(ls[i])
-
-    def __cambiar_colores(self, ax):
-        palette = sns.color_palette('colorblind',3)[::-1]
-        for i, line in enumerate(ax.get_lines()):
-            line.set_color(palette[i])
+        self._obtener_indicadores() # checa si este se puede quitar
+        return super().obtener_df(**kwargs)

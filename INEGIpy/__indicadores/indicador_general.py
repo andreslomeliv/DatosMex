@@ -1,7 +1,4 @@
-##################################################################
-######### Problemas
-###################################################################3333333
-# no cambia la gráfica la gráfica cuando se redefinen los años
+# este modulo está fallando. Necesito revisarlo bien. 
 
 from .inegi_general import INEGI_General
 
@@ -9,17 +6,9 @@ class IndicadorGeneral(INEGI_General):
     
     def __init__(self, token):
         super().__init__(token)
-
-    def definir_indicadores(self, indicadores):
-        if self._indicadores != indicadores: self._cambios = True
-        self._indicadores = indicadores
-
-    def definir_nombres(self, nombres):
-        if self._columnas != nombres: self._cambios = True
-        self._columnas = nombres
-
-    def definir_bancos(self, bancos):
-        self._bancos = bancos
+        self.indicadores = None
+        self.bancos = None
+        self.nombres = None
 
     def obtener_df(self, **kwargs):
         """
@@ -37,9 +26,19 @@ class IndicadorGeneral(INEGI_General):
                     o en INEGI.IndicadorGeneral.fin
         """
         for key, value in kwargs.items():
-            if key == 'indicadores': self.definir_indicadores(value)
-            if key == 'bancos': self.definir_bancos(value)
-            if key == 'nombres': self.definir_nombres(value)
-        return super().obtener_df()
+            if key == 'indicadores': self._indicadores = value
+            else: self._indicadores = self.indicadores
+
+            if key == 'bancos': self._bancos = value
+            else: self._bancos = self.bancos
+            
+            if key == 'nombres': self._columnas = value
+            else: self._columnas = self.nombres
+
+        kwargs.pop('indicadores', None)
+        kwargs.pop('bancos', None)
+        kwargs.pop('nombres', None)
+
+        return super().obtener_df(**kwargs)
 
     
