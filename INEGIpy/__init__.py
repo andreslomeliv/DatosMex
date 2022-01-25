@@ -1,1 +1,2 @@
-from .Indicadores import IndicadorGeneral, PIB
+from .__indicadores import IndicadorGeneral, PIB
+
