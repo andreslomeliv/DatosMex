@@ -1,6 +1,4 @@
-# Notas: a veces se vuelve a llamar al API aunque no cambiaron los indicadores, generalmente lo hace la primera
-# vez después de haber llamado al df
-# se tiene que agregar las opciones disponibles y errores cuando se pida una serie que no exista
+#Según yo solo falta elegir la forma de presentar las series disponibles.
 
 from .serie_general import Serie_General
 
@@ -56,6 +54,7 @@ class PIB(Serie_General):
         self._indicadores = indicadores
         self._bancos = bancos
         self._columnas = columnas
+        if self.serie == 'anual': self._periodos = None
 
     def obtener_df(self, **kwargs):
         for key, value in kwargs.items():

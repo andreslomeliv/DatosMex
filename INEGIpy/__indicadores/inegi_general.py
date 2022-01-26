@@ -1,12 +1,17 @@
 # Notas: a veces se vuelve a llamar al API aunque no cambiaron los indicadores, generalmente lo hace la primera
 # vez después de haber llamado al df
-# También se tienen que arreglar los problemas con la periodización:
-# los trimestres los pone como si fueran los primeros cuatro meses porque el inegi los marca como trimestre 1, 2, etc.
-# entonces pd los interpreta diferente. Se necesita arreglar eso
 
-# antes lop había resuelto con un diccionario que multiplicara al mes por un factor de acuerdo con la clave de 
-# periodozación que da el inegi. El diccoinario va a ser necesario pero creo que sale mejor usar alguna
-# librería o función que maneje periodos como trimestres, quincenas etc. tendré que revisar eso.
+# Las quincenas no funcionan bien por culpa de febrero, posiblemente se tenga que cambiar a date_range pero es más complicado
+# por lo pronto no le hace cambios pero para será necesario para el módulo del INPC
+
+# Aún quedan periodozaciones que no se han resuelto por ser irregulares o por no poder encontrar ejemplos para
+# ver qué se tiene que hacer. Por ejemplo, las series decenales y semanales se pueden incorporar sin problema
+# pero no encuentro series con esas periocidades para ver el formato que usan. Estoy a la espera de que me 
+# me ayuden con esto.
+
+# para las series que no tienen datetimeindex se tiene que arreglar el eje x de la gráfica. Queda todo amontonado. Tal vez lo mejor 
+# sí sea ya invertirle tiempo a usar date_range para no "hardcodear" este problema
+
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -27,6 +32,14 @@ class INEGI_General:
         self._df = None
         self._columnas = list()
         self._indicadores_previos = list()
+        # diccionario con la clave de frecuencia del INEGI y el factor por el cual se debe multiplicar
+        # el último valor para pasarlo a su mes correspondiente
+        # Ejemplo: una serie semestral tiene como clave de frecuencia '4', esto indica que para cada año van
+        # a haber dos periodos indicando los dos semestres: "2020/01, 2020/02"
+        # El factor del diccionario indicaría que al último dígito lo multiplicamos por 6 para pasarlo a meses
+        # las claves que no se encuentran en el diccionario son irregulares y no se van a operar
+        self.__frecuancias_dict = {'BIE': {'1':1, '2':1, '3':1, '4':6, '5':4, '6':3, '7':2, '8':1},
+                                    'BISE': {'1':1, '3':1, '4':3, '7':15, '8':1, '9':1, '16':1}}
         
 ############## Obtener Data Frame ########################
 
@@ -69,7 +82,7 @@ class INEGI_General:
         data = json.loads(req.text)
         return data
     
-    def __json_a_df(self, data):
+    def __json_a_df(self, data, banco):
         """ 
         
         Construye un DataFrame con la información resultante del API del INEGI de 
@@ -78,8 +91,8 @@ class INEGI_General:
         Parámetros:
         -----------
         data: Dict. JSON obtendio del API del INEGI.
-        indicador: str. Se utiliza el indicador de la serie aunque realmente sirve como nombre de 
-                        columna.
+        banco: str. Banco de información donde se encuentra el indocador. Puede ser 
+                    'BIE' o 'BISE'.
         -----------
         
         Regresa un objeto tipo DataFrame con la información del indicador proporcionada por el API
@@ -92,8 +105,16 @@ class INEGI_General:
         dic = {'fechas':[data['Series'][0]['OBSERVATIONS'][i]['TIME_PERIOD'] for i in range(obs_totales)],
                 'valor':[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) for i in range(obs_totales)]}
         df = pd.DataFrame.from_dict(dic)
-        df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
-        df = df.drop(['fechas'],axis=1)
+        frecuencia = data['Series'][0]['FREQ']
+        factor = self.__frecuancias_dict[banco].get(frecuencia) # factor que multiplica el periodo para pasar a fecha
+        if factor: 
+            cambio_fechas = lambda x: '/'.join(x.split('/')[:-1] + [str(int(x.split('/')[-1])*factor)])
+            df.fechas = df.fechas.apply(cambio_fechas)
+            df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
+            df = df.drop(['fechas'],axis=1)
+        else:
+            df.set_index(df.fechas,inplace=True, drop=True)
+            df = df.drop(['fechas'],axis=1)
         return df
 
     def obtener_df(self, **kwargs):
@@ -107,13 +128,16 @@ class INEGI_General:
             if key == 'inicio': self.inicio = value
             if key == 'fin': self.fin = value
         
+        if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
+        if isinstance(self._bancos, str): self._bancos = [self._bancos]
+
         if self._df is None or self.__checar_cambios():
             lista_df = []
             for i in range(len(self._indicadores)):
                 indicador = self._indicadores[i]
                 banco = self._bancos[i]
                 data = self.__obtener_json(indicador, banco)
-                df = self.__json_a_df(data)
+                df = self.__json_a_df(data, banco)
                 if banco == 'BIE': df = df[::-1]
                 lista_df.append(df)
         
