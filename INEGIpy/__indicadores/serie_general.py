@@ -12,12 +12,17 @@ class Serie_General(INEGI_General):
     def _obtener_indicadores(self):
         pass
 
-    def obtener_df(self, **kwargs):
-        for key, value in kwargs.items():
-            if key == 'serie': self.serie = value
-        kwargs.pop('serie', None)
+    def obtener_df(self, serie, inicio, fin):
+        if serie: self.serie = serie
         self._obtener_indicadores()
-        return super().obtener_df(**kwargs)
+        return super().obtener_df(inicio, fin)
+
+    def series_disponibles(self):
+        """
+        Regresa una lista con las series disponibles en cada módulo.
+        
+        """
+        return list(self._indicadores_dict.keys())
 
 ################ Mostrar series disponibles ##################################
 

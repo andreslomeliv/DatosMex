@@ -6,8 +6,6 @@
 
 #Por lo pronto así se queda pero es algo por ver
 
-# también debo checar si es mejor cambiar **kwargs por los parámetros inicializados en None
-
 from .inegi_general import INEGI_General
 
 class IndicadorGeneral(INEGI_General):
@@ -18,41 +16,36 @@ class IndicadorGeneral(INEGI_General):
         self.bancos = list()
         self.nombres = list()
 
-    def obtener_df(self, **kwargs):
+    def obtener_df(self, indicadores = None, bancos = None, nombres = None, inicio = None, fin = None):
         """
+        Regresa un DataFrame con la información de los indicadores proporcionada por el API del INEGI.
+        Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
+
         Parametros
         -----------
-        indicadores: list. Lista con los indicadores de las series a obtener. También se puede especificar 
-                    en INEGI.IndicadorGeneral.indicadores()
-        bancos: list. Lista con los bancos donde se encuentran las series a obtener. También se puede especificar 
-                    en INEGI.IndicadorGeneral.bancos(). 
-        nombres: list. Lista con los nombres de las columas del DataFrame. De no proporcionarse, se usarán los indicadores.
+        indicadores: list/str. Lista con los indicadores de las series a obtener. También se puede especificar 
+                    en INEGI.IndicadorGeneral.indicadores
+        bancos: list/str. Lista con los bancos donde se encuentran las series a obtener. También se puede especificar 
+                    en INEGI.IndicadorGeneral.bancos
+        nombres: list/str. Lista con los nombres de las columas del DataFrame. De no proporcionarse, se usarán los indicadores.
                     También se puede especificar en INEGI.IndicadorGeneral.indicadores()
         inicio: str. Fecha donde iniciar la serie. También se puede especificar en INEGI.Indicador_General.definir_periodo()
                     o en INEGI.IndicadorGeneral.inicio
         fin: str. Fecha donde terminar la serie. También se puede especificar en INEGI.Indicador_General.definir_periodo()
                     o en INEGI.IndicadorGeneral.fin
+        ----------
+
         """
         self._indicadores = self.indicadores
         self._bancos = self.bancos
         self._columnas = self.nombres
-        for key, value in kwargs.items():
-            if key == 'indicadores': 
-                self._indicadores = value
-                self.indicadores = value
-            if key == 'bancos': 
-                self._bancos = value
-                self.bancos = value
-            if key == 'nombres': 
-                self._columnas = value
-                self.nombres = value
+        
+        if indicadores: self._indicadores = indicadores
+        if bancos: self._bancos = bancos
+        if nombres: self._columnas = nombres
+        elif len(self.nombres) == 0: self._columnas = self._indicadores
         
         if isinstance(self._columnas, str): self._columnas = [self._columnas]
-
-        kwargs.pop('indicadores', None)
-        kwargs.pop('bancos', None)
-        kwargs.pop('nombres', None)
-
-        return super().obtener_df(**kwargs)
+        return super().obtener_df(inicio, fin)
 
     

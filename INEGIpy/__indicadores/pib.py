@@ -7,7 +7,7 @@ class PIB(Serie_General):
     def __init__(self, token):
         super().__init__(token)
         self.serie = 'trimestral desestacionalizada'
-        self.valores = 'real'
+        self.reales = True
         self.sectores = 'total'
         self._columnas = ['PIB total']
         self._indicadores_dict = {'trimestral desestacionalizada':
@@ -44,25 +44,53 @@ class PIB(Serie_General):
         super()._obtener_indicadores()
         dict_indicadores = self._indicadores_dict[self.serie]
         if isinstance(self.sectores, str): self.sectores = [self.sectores]
+        if self.reales: valores = 'real'
+        else: valores = 'nominal'
         indicadores = list()
         bancos = list()
         columnas = list()
         for sector in self.sectores:
-            indicadores.append(dict_indicadores[sector][self.valores][0]) 
-            bancos.append(dict_indicadores[sector][self.valores][1])
+            indicadores.append(dict_indicadores[sector][valores][0]) 
+            bancos.append(dict_indicadores[sector][valores][1])
             columnas.append('PIB {}'.format(sector))
         self._indicadores = indicadores
         self._bancos = bancos
         self._columnas = columnas
         if self.serie == 'anual': self._periodos = None
 
-    def obtener_df(self, **kwargs):
-        for key, value in kwargs.items():
-            if key == 'sectores': self.sectores = value   
-            if key == 'valores': self.valores = value
-                
-        kwargs.pop('sectores', None)
-        kwargs.pop('valores', None)
+    def obtener_df(self, serie = None, sectores = None, reales = True, inicio = None, fin = None):
+        """
+        Regresa un DataFrame con la información de los indicadores proporcionada por el API del INEGI.
+        Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
 
+        Parametros
+        -----------
+        serie: str. String con el nombre de la serie a obtener. También se puede especificar en INEGI.PIB.serie
+        sectores: list/str. Lista sectores a obtener. También se puede especificar en PIB.serie
+        reales: bool. True si la serie es en valores reales (precios fijos). False si son valores nominales (precios corrientes)
+                      También se puede especificar en PIB.reales
+        inicio: str. Fecha donde iniciar la serie. También se puede especificar en PIB.inicio
+        fin: str. Fecha donde terminar la serie. También se puede especificar en PIB.fin
+        -----------
+
+        """
+        if sectores: self.sectores = sectores
+        if reales: self.reales = reales
         self._obtener_indicadores() # checa si este se puede quitar
-        return super().obtener_df(**kwargs)
+        return super().obtener_df(sectores, inicio, fin)
+
+    def sectores_disponibles(self, serie = None):
+        """
+        Regresa una lista con los sectores disponibles. Algunas series no tienen todos los sectores por lo que se puede especificar
+        la serie para ver qué sectores están disponibles para esa serie en particular.
+        
+        También es importante anotar que el solamente el PIB Total cuenta con valores nominales, los sectores no.
+
+        Parametros
+        -----------
+        serie: str. String con el nombre de la serie.
+        -----------
+
+        """
+        if serie: return list(self._indicadores_dict[serie].keys())
+        else: return list(self._indicadores_dict['trimestral desestacionalizada'].keys())

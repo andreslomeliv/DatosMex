@@ -1,16 +1,10 @@
 # Notas: a veces se vuelve a llamar al API aunque no cambiaron los indicadores, generalmente lo hace la primera
 # vez después de haber llamado al df
 
-# Las quincenas no funcionan bien por culpa de febrero, posiblemente se tenga que cambiar a date_range pero es más complicado
-# por lo pronto no le hace cambios pero para será necesario para el módulo del INPC
-
 # Aún quedan periodozaciones que no se han resuelto por ser irregulares o por no poder encontrar ejemplos para
 # ver qué se tiene que hacer. Por ejemplo, las series decenales y semanales se pueden incorporar sin problema
 # pero no encuentro series con esas periocidades para ver el formato que usan. Estoy a la espera de que me 
 # me ayuden con esto.
-
-# para las series que no tienen datetimeindex se tiene que arreglar el eje x de la gráfica. Queda todo amontonado. Tal vez lo mejor 
-# sí sea ya invertirle tiempo a usar date_range para no "hardcodear" este problema
 
 
 import pandas as pd
@@ -38,8 +32,9 @@ class INEGI_General:
         # a haber dos periodos indicando los dos semestres: "2020/01, 2020/02"
         # El factor del diccionario indicaría que al último dígito lo multiplicamos por 6 para pasarlo a meses
         # las claves que no se encuentran en el diccionario son irregulares y no se van a operar
-        self.__frecuancias_dict = {'BIE': {'1':1, '2':1, '3':1, '4':6, '5':4, '6':3, '7':2, '8':1},
-                                    'BISE': {'1':1, '3':1, '4':3, '7':15, '8':1, '9':1, '16':1}}
+        self.__frecuancias_dict = {'BIE': {'1':(1,'Y'), '2':(1,'Y'), '3':(1,'Y'), '4':(6,'M'), '5':(4,'M'), '6':(3,'Q'), 
+                                            '7':(2,'M'), '8':(1,'M'), '9':(14,'SM')},
+                                    'BISE': {'1':(1,'Y'), '3':(1,'Y'), '4':(3,'Q'), '7':(14,'SM'), '8':(1,'M'), '9':(1,'Y'), '16':(1,'Y')}}
         
 ############## Obtener Data Frame ########################
 
@@ -106,27 +101,22 @@ class INEGI_General:
                 'valor':[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) for i in range(obs_totales)]}
         df = pd.DataFrame.from_dict(dic)
         frecuencia = data['Series'][0]['FREQ']
-        factor = self.__frecuancias_dict[banco].get(frecuencia) # factor que multiplica el periodo para pasar a fecha
+        factor, period = self.__frecuancias_dict[banco].get(frecuencia) # factor que multiplica el periodo para pasar a fecha y periodo de pd
         if factor: 
             cambio_fechas = lambda x: '/'.join(x.split('/')[:-1] + [str(int(x.split('/')[-1])*factor)])
             df.fechas = df.fechas.apply(cambio_fechas)
             df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
             df = df.drop(['fechas'],axis=1)
+            if period == 'SM': df.index = df.index + pd.offsets.SemiMonthEnd()
+            else: df.index = df.index.to_period(period)
         else:
             df.set_index(df.fechas,inplace=True, drop=True)
             df = df.drop(['fechas'],axis=1)
         return df
 
-    def obtener_df(self, **kwargs):
-        """ 
-        Regresa un objeto tipo DataFrame con la información de los indicadores proporcionada
-        por el API del INEGI.
-        Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
-    
-        """
-        for key, value in kwargs.items():
-            if key == 'inicio': self.inicio = value
-            if key == 'fin': self.fin = value
+    def obtener_df(self, inicio, fin):
+        if inicio: self.inicio = inicio
+        if fin: self.fin = fin
         
         if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
         if isinstance(self._bancos, str): self._bancos = [self._bancos]
@@ -158,7 +148,7 @@ class INEGI_General:
 
     def __cambiar_estilos(self, ax):
         # checar cuál es la mejor manera de elejir los estilos
-        line_styles = ['--','-.','-',':']
+        line_styles = ['-','-.','--',':']
         markers = ['o','v','s','x','D']
         for i, line in enumerate(ax.get_lines()):
             if i <= 3: line.set_linestyle(line_styles[i])
