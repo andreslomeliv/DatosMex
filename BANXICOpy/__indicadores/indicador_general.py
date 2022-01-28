@@ -1,26 +1,17 @@
-class BanxicoGeneral:
+import requests
+import json
+import pandas as pd
+
+class IndicadorGeneral:
     def __init__(self, token):
         self.__token = token
-        self.__liga = 'https://www.banxico.org.mx/SieAPIRest/service/v1/series/'
-        self.__inicio = None
-        self.__fin = None
-        self.__indicadores = []
-
-    def definir_indicadores(self, indicadores):
-        self.__indicadores = indicadores
-        return self
-
-    def indicadores_a_df(self):
-        dfs = []
-        for indicador in self.__indicadores:
-            df = self.__obtener_df(indicador)
-            df.columns = [indicador]
-            dfs.append(df)
-        df = pd.concat(lista_df,axis=1)
-        return df
+        self.__liga_base = 'https://www.banxico.org.mx/SieAPIRest/service/v1/series/'
+        self._inicio = None
+        self._fin = None
+        self._indicadores = []
         
     #Método general para obtener la serie de un indicador
-    def __obtener_df(self, indicador):
+    def obtener_df(self, indicador):
         """
         Parámetros
         --------------
@@ -30,7 +21,7 @@ class BanxicoGeneral:
         --------------
         Más información en https://www.banxico.org.mx/SieAPIRest/service/v1/doc/catalogoSeries#
         """   
-        req = requests.get(liga_banxico+indicador+'/datos',params={'token':self.__token})
+        req = requests.get(self.__liga_base + indicador+'/datos',params={'token':self.__token})
         data = json.loads(req.text)
         n = len(data['bmx']['series'][0]['datos'])
         dict_df = dict(fechas = [data['bmx']['series'][0]['datos'][i]['fecha'] for i in range(n)],
@@ -39,6 +30,4 @@ class BanxicoGeneral:
         df.index = pd.to_datetime(df.fechas,format='%d/%m/%Y')
         df = df.drop(['fechas'],axis=1)
         df.columns = [indicador]
-        return df[inicio:fin]
-
-    
+        return df[self._inicio:self._fin]

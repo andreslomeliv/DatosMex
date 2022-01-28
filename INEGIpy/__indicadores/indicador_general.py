@@ -16,7 +16,7 @@ import json
 class IndicadorGeneral:
     
     def __init__(self, token):
-        self.token = token
+        self.__token = token
         self.__liga_base = 'https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/'
         self._indicadores_dict = dict()
         self._indicadores = list()
@@ -69,7 +69,7 @@ class IndicadorGeneral:
         indicador = indicador + '/'
         idioma = 'es/'
         banco = banco + '/2.0/'
-        final_liga = str(self.token) + '?type=json'
+        final_liga = str(self.__token) + '?type=json'
         liga_api = self.__liga_base + indicador + idioma + '0700/false/' + banco + final_liga
         print(liga_api)
         req = requests.get(liga_api)
