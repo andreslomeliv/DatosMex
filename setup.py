@@ -3,7 +3,7 @@ from setuptools import setup
 
 # meta-data de la librería
 NAME = 'INEGI'
-DESCRIPTION = 'Wrap para el API del INEGI'
+DESCRIPTION = 'Wrap para el API del INEGI y de Banxico'
 URL = ''
 EMAIL = ''
 AUTHOR = 'ALV'
@@ -12,7 +12,7 @@ VERSION = '0.1.0'
 
 # librerías requeridas
 REQUIRED = [
-		'requests','pandas','matplotlib','pprint','seaborn'
+		'requests','pandas','matplotlib','seaborn'
 		]
 
 setup(
@@ -23,7 +23,7 @@ setup(
 	author_email=EMAIL,
 	python_requires=REQUIRES_PYTHON,
 	url=URL,
-	packages=['INEGI'],
+	packages=['INEGIpy', 'BANXICOpy],
 	install_requires=REQUIRED,
 	license='MIT'
 )
