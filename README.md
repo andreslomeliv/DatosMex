@@ -48,7 +48,8 @@ indicador.fin = '2021-12'
 indicador.obtener_df()
 indicador.grafica()
 ```
-Los indicadores se pueden obtener del [constructor de consultas](https://www.inegi.org.mx/servicios/api_indicadores.html) proporcionado por el INEGI.
 Las consultas ya generadas se mantienen guardadas en el mismo objeto para uso subsecuente a menos que se cambie algún parámetro. Esto funciona en ambas formas: ya sea estableciendo los parámetros dentro o fuera de las funciones.
+
+Los indicadores se pueden obtener del [constructor de consultas](https://www.inegi.org.mx/servicios/api_indicadores.html) proporcionado por el INEGI.
 
 
