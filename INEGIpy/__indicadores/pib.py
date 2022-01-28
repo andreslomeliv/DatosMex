@@ -1,5 +1,3 @@
-#Según yo solo falta elegir la forma de presentar las series disponibles.
-
 from .serie_general import Serie_General
 
 class PIB(Serie_General):
