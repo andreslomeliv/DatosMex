@@ -16,7 +16,7 @@ Además de un método general para obtener las series, se están desarrollando m
 * Desocupación
 
 Cada módulo cuenta con dos funciones: ```obtener_df()``` y ```grafica()``` los cuales regresan la información proporcionada por el API del INEGI en ambos formatos.
-Los indicadores, series, años y otros parámetros se puden proporcionar como argumentos de las funciones o como atributos públicos de los objetos. 
+Los indicadores, series, años y otros parámetros se pueden proporcionar como argumentos de las funciones o como atributos públicos de los objetos. 
 
 ### Uso:
 ```python
