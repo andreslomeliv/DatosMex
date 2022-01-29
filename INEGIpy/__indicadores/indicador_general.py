@@ -18,7 +18,6 @@ class IndicadorGeneral:
     def __init__(self, token):
         self.__token = token
         self.__liga_base = 'https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/'
-        self._indicadores_dict = dict()
         self._indicadores = list()
         self._bancos = list()
         self.inicio = None
@@ -37,12 +36,6 @@ class IndicadorGeneral:
                                     'BISE': {'1':(1,'Y'), '3':(1,'Y'), '4':(3,'Q'), '7':(14,'SM'), '8':(1,'M'), '9':(1,'Y'), '16':(1,'Y')}}
         
 ############## Obtener Data Frame ########################
-
-    def __checar_cambios(self):
-        if self._indicadores != self._indicadores_previos:
-            self._indicadores_previos = self._indicadores
-            return True
-        else: return False
 
     def __obtener_json(self, indicador, banco):
         """ 
@@ -71,9 +64,7 @@ class IndicadorGeneral:
         banco = banco + '/2.0/'
         final_liga = str(self.__token) + '?type=json'
         liga_api = self.__liga_base + indicador + idioma + '0700/false/' + banco + final_liga
-        print(liga_api)
         req = requests.get(liga_api)
-        print(req)
         data = json.loads(req.text)
         return data
     
@@ -121,7 +112,8 @@ class IndicadorGeneral:
         if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
         if isinstance(self._bancos, str): self._bancos = [self._bancos]
 
-        if self._df is None or self.__checar_cambios():
+        if self._df is None or self._indicadores != self._indicadores_previos:
+            self._indicadores_previos = self._indicadores
             lista_df = []
             for i in range(len(self._indicadores)):
                 indicador = self._indicadores[i]

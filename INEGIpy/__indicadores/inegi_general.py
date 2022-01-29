@@ -40,9 +40,15 @@ class INEGI_General(IndicadorGeneral):
         self._bancos = self.bancos
         self._columnas = self.nombres
         
-        if indicadores: self._indicadores = indicadores
-        if bancos: self._bancos = bancos
-        if nombres: self._columnas = nombres
+        if indicadores: 
+            self._indicadores = indicadores
+            self.indicadores = indicadores
+        if bancos: 
+            self._bancos = bancos
+            self.bancos = bancos
+        if nombres: 
+            self._columnas = nombres
+            self.nombres = nombres
         elif len(self.nombres) == 0: self._columnas = self._indicadores
         
         if isinstance(self._columnas, str): self._columnas = [self._columnas]

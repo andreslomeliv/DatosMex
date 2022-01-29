@@ -7,7 +7,7 @@ class Serie_General(IndicadorGeneral):
     def __init__(self, token):
         super().__init__(token)
         self.serie = None
-        self.consulta = dict()
+        self._indicadores_dict = dict()
 
     def _obtener_indicadores(self):
         pass
