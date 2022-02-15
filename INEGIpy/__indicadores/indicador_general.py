@@ -1,6 +1,3 @@
-# Notas: a veces se vuelve a llamar al API aunque no cambiaron los indicadores, generalmente lo hace la primera
-# vez después de haber llamado al df
-
 # Aún quedan periodozaciones que no se han resuelto por ser irregulares o por no poder encontrar ejemplos para
 # ver qué se tiene que hacer. Por ejemplo, las series decenales y semanales se pueden incorporar sin problema
 # pero no encuentro series con esas periocidades para ver el formato que usan. Estoy a la espera de que me 
@@ -16,15 +13,16 @@ import json
 class IndicadorGeneral:
     
     def __init__(self, token):
-        self.__token = token
+        self.__token = token # token proporcionado por el INEGI único para cada usuario
         self.__liga_base = 'https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/INDICATOR/'
-        self._indicadores = list()
-        self._bancos = list()
-        self.inicio = None
-        self.fin = None
-        self._df = None
-        self._columnas = list()
-        self._indicadores_previos = list()
+        # vriables para la consulta
+        self._indicadores = list() # lista con los indicadores a consultar. cada módulo la llena con sus especificaciones
+        self._bancos = list() # lista con los bancos de los indicadores
+        self.inicio = None # fecha de inicio de la serie
+        self.fin = None # fecha de fin de la serie
+        self._df = None # atributo interno con el último DataFrame consultado. Evita llamar al API si no cambiaron los indicadores
+        self._columnas = list() # nombres de las columnas. En los módulos de series se llena automáticamente.
+        self._indicadores_previos = list() # lista con indicadores previos. Evita llamar al API si no cambiaron los indicadores.
         # diccionario con la clave de frecuencia del INEGI y el factor por el cual se debe multiplicar
         # el último valor para pasarlo a su mes correspondiente
         # Ejemplo: una serie semestral tiene como clave de frecuencia '4', esto indica que para cada año van
@@ -37,6 +35,12 @@ class IndicadorGeneral:
         
 ############## Obtener Data Frame ########################
 
+# Se definen  los métodos internos y públicos necesarios para obtener la serie y pasarla a un DataFrame
+# Las dos variables esenciales para esto son self._indicadores y self._bancos. Cada módulo debe contar con métodos
+# o atributos que permitan definir estas variables. También todas las variables de consulta deben ser accesibles tanto 
+# dentro de las funciones obtener_df() y grafica() como parámetros así como atributos de la clase. 
+
+    # aquí falta un control de errores cuando no se pudo obtener la info y advirtiendo que se cheque bien el token
     def __obtener_json(self, indicador, banco):
         """ 
     
@@ -105,6 +109,8 @@ class IndicadorGeneral:
             df = df.drop(['fechas'],axis=1)
         return df
 
+    # en este módulo solo se definen inicio y fin como variables ya que son las únicas que necesariamente están en
+    # cada módulo. El resto de las variables se van definiendo en los módulos que hereden esta clase. 
     def obtener_df(self, inicio, fin):
         if inicio: self.inicio = inicio
         if fin: self.fin = fin
@@ -129,7 +135,11 @@ class IndicadorGeneral:
 
         return self._df[self.inicio:self.fin] 
 
-##################### Graficar ######################
+##################### Graficar #######################
+
+# define los métodos públicos e internos para elaborar una gráfica base con la serie consultada
+# por default utiliza la última consulta generada o definida aunque se puede redefinir variables de la consulta 
+# dentro de la función.
 
     def __cambiar_lineas(self, ax, estilo):
         if estilo == 'colores':
@@ -153,14 +163,11 @@ class IndicadorGeneral:
 
     def grafica(self, estilo = 'colores', show = True, filename = None, **kwargs):
         """
-        Construye un gráfico con la consulta definida. En caso de querer cambiar la consulta se pueden indicar los parámetros
-        deseados: inicio, fin, indicador, serie, o cualquiera de los parámetros particulares de la serie.
+        Construye un gráfico con la consulta definida. En caso de querer cambiar la consulta se pueden indicar los parámetros deseados: inicio, fin, indicador, serie, o cualquiera de los parámetros particulares de la serie.
 
         NOTA:
-        Esta función no pretende remplazar el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar
-        estilos de gráficas que puedan ser de uso común. Por ello, la gráfica generada tiene solo ciertos estilos disponibles. 
-        Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas
-        directamente con los datos o para manipular los objetos fig y ax que regresa esta función. 
+        Esta función no pretende remplazar el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar estilos de gráficas que puedan ser de uso común. Por ello, la gráfica generada tiene solo ciertos estilos disponibles. 
+        Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas directamente con los datos o para manipular los objetos fig y ax que regresa esta función. 
 
         Parámetros
         -----------

@@ -8,14 +8,16 @@
 
 from .indicador_general import IndicadorGeneral
 
-class INEGI_General(IndicadorGeneral):
+class INEGI(IndicadorGeneral):
     
     def __init__(self, token):
         super().__init__(token)
+        # atributos de la consulta general
         self.indicadores = list()
         self.bancos = list()
         self.nombres = list()
 
+    # Las variables de la consulta pueden ser definidos o redefinidos con los parámteros de la función
     def obtener_df(self, indicadores = None, bancos = None, nombres = None, inicio = None, fin = None):
         """
         Regresa un DataFrame con la información de los indicadores proporcionada por el API del INEGI.

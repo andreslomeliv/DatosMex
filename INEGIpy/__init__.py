@@ -1,2 +1,2 @@
-from .__indicadores import INEGI_General, PIB
+from .__indicadores import INEGI, PIB
 

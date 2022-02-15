@@ -1,2 +1,2 @@
-from .inegi_general import INEGI_General
+from .inegi_general import INEGI
 from .pib import PIB

@@ -38,6 +38,7 @@ class PIB(Serie_General):
                                              'nominal':('493765','BIE')}}}
         #self.consulta = None
         
+    # Aquí debería de haber un manejo de errores que explique cuando se intentó definir una consulta que no existe
     def _obtener_indicadores(self):
         super()._obtener_indicadores()
         dict_indicadores = self._indicadores_dict[self.serie]
@@ -56,6 +57,7 @@ class PIB(Serie_General):
         self._columnas = columnas
         if self.serie == 'anual': self._periodos = None
 
+    # se agregan las últimas variables necesarias para este módulo
     def obtener_df(self, serie = None, sectores = None, reales = True, inicio = None, fin = None):
         """
         Regresa un DataFrame con la información de los indicadores proporcionada por el API del INEGI.
@@ -75,7 +77,7 @@ class PIB(Serie_General):
         if sectores: self.sectores = sectores
         if reales: self.reales = reales
         self._obtener_indicadores() # checa si este se puede quitar
-        return super().obtener_df(sectores, inicio, fin)
+        return super().obtener_df(serie, inicio, fin)
 
     def sectores_disponibles(self, serie = None):
         """
