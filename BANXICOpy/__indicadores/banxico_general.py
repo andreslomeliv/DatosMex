@@ -1,10 +1,9 @@
 from .indicador_general import IndicadorGeneral
 
-class Banxico_General(IndicadorGeneral):
+class Banxico(IndicadorGeneral):
     def __init__(self, token):
         super().__init__(token)
         self.indicadores = list()
-        self.bancos = list()
         self.nombres = list()
 
     def obtener_df(self, indicadores = None, nombres = None, inicio = None, fin = None):
