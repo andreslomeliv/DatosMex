@@ -1,4 +1,4 @@
-from .indicador_general import IndicadorGeneral
+from ._indicador_general import IndicadorGeneral
 
 class Banxico(IndicadorGeneral):
     def __init__(self, token):

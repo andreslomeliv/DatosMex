@@ -1,1 +1,1 @@
-from .__indicadores import Banxico_General
+from .banxico_general import Banxico_General

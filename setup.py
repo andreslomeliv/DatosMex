@@ -2,17 +2,17 @@
 from setuptools import setup
 
 # meta-data de la librería
-NAME = 'INEGI'
-DESCRIPTION = 'Wrap para el API del INEGI y de Banxico'
+NAME = 'DatosMex'
+DESCRIPTION = 'Wrap para los APIs del INEGI y de Banxico'
 URL = ''
-EMAIL = ''
+EMAIL = 'andres.lomeli.v@gmail.com'
 AUTHOR = 'ALV'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1.0'
 
 # librerías requeridas
 REQUIRED = [
-		'requests','pandas','matplotlib','seaborn'
+		'requests','pandas','matplotlib','seaborn','geopandas','shapely'
 		]
 
 setup(
@@ -23,7 +23,7 @@ setup(
 	author_email=EMAIL,
 	python_requires=REQUIRES_PYTHON,
 	url=URL,
-	packages=['INEGIpy', 'BANXICOpy],
+	packages=['INEGIpy', 'BANXICOpy'],
 	install_requires=REQUIRED,
 	license='MIT'
 )

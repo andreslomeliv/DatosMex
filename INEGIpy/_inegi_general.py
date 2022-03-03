@@ -6,7 +6,7 @@
 
 #Por lo pronto así se queda pero es algo por ver
 
-from .indicador_general import IndicadorGeneral
+from ._indicador_general import IndicadorGeneral
 
 class INEGI(IndicadorGeneral):
     

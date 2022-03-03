@@ -1,4 +1,4 @@
-from .serie_general import SerieGeneral
+from ._serie_general import SerieGeneral
 
 class TipoDeCambio(SerieGeneral):
     def __init__(self, token):

@@ -1,6 +1,6 @@
 # se tiene que agregar errores cuando se pida una serie que no exista
 
-from .indicador_general import IndicadorGeneral
+from ._indicador_general import IndicadorGeneral
 
 class Serie_General(IndicadorGeneral):
 

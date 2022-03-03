@@ -1,4 +1,4 @@
-from .serie_general import Serie_General
+from ._serie_general import Serie_General
 
 class PIB(Serie_General):
     
