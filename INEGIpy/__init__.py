@@ -1,2 +1,2 @@
-from .__indicadores import INEGI, PIB
+from .__indicadores import INEGI, PIB, DENUE, Mapas
 
