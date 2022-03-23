@@ -1,0 +1,7 @@
+pandas==1.0.5
+matplotlib==3.2.2
+seaborn==0.10.1
+requests==2.24.0
+shapely==1.8.1.post1
+geopandas==0.10.2
+fiona==1.8.21
