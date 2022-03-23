@@ -1,3 +1,8 @@
+import pandas as pd
+import requests
+import json
+import geopandas as gpd
+
 class MarcoGeoestadistico:
     def __init__(self):
         self.__liga_base = 'https://gaia.inegi.org.mx/wscatgeo/'
