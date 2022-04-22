@@ -1,4 +1,5 @@
-from ._inegi_general import INEGI
+from ._indicadores import Indicadores
 from ._pib import PIB
 from ._denue import DENUE
-from ._marco_geoestadistico import Mapas
+from ._marco_geoestadistico import MarcoGeoestadistico
+from ._ruteo import Ruteo

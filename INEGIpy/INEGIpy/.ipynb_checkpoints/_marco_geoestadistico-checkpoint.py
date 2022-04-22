@@ -84,8 +84,9 @@ class MarcoGeoestadistico:
             c_df = pd.concat(dfs, axis = 0)
             return c_df
         else:
-            return self.__obtener_df(liga, as_gdf)
+            return self.__obtener_geodf(liga, as_gdf)
     
+    # tal vez nombrarla entidades?
     def Entidades(self, entidades = None, nombres = None, as_geodf = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas estatales.

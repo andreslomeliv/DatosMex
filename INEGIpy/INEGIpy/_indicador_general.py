@@ -41,6 +41,12 @@ class IndicadorGeneral:
 # dentro de las funciones obtener_df() y grafica() como parámetros así como atributos de la clase. 
 
     # aquí falta un control de errores cuando no se pudo obtener la info y advirtiendo que se cheque bien el token
+    def __request(self, liga_api):
+        req = requests.get(liga_api)
+        assert req.status_code == 200, 'No se encontró información con las parámetros especificados.'
+        data = json.loads(req.text)
+        return data
+
     def __obtener_json(self, indicador, banco):
         """ 
     
@@ -63,14 +69,20 @@ class IndicadorGeneral:
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
     
         """
-        indicador = indicador + '/'
-        idioma = 'es/'
-        banco = banco + '/2.0/'
-        final_liga = str(self.__token) + '?type=json'
-        liga_api = self.__liga_base + indicador + idioma + '0700/false/' + banco + final_liga
-        req = requests.get(liga_api)
-        data = json.loads(req.text)
-        return data
+        if banco: 
+            liga_api = '{}{}/es/0700/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, banco, str(self.__token))
+            data = self.__request(liga_api)
+        else:
+            try: 
+                banco = 'BIE'
+                liga_api = '{}{}/es/0700/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, banco, str(self.__token))
+                data = self.__request(liga_api)
+            except: 
+                banco = 'BISE'
+                liga_api = '{}{}/es/0700/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, banco, str(self.__token))
+                data = self.__request(liga_api)
+
+        return data, banco
     
     def __json_a_df(self, data, banco):
         """ 
@@ -102,8 +114,7 @@ class IndicadorGeneral:
             df.fechas = df.fechas.apply(cambio_fechas)
             df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
             df = df.drop(['fechas'],axis=1)
-            if period == 'SM': df.index = df.index + pd.offsets.SemiMonthEnd()
-            else: df.index = df.index.to_period(period)
+            if period == 'SM': df.index = df.index + pd.offsets.SemiMonthBegin()
         else:
             df.set_index(df.fechas,inplace=True, drop=True)
             df = df.drop(['fechas'],axis=1)
@@ -123,8 +134,9 @@ class IndicadorGeneral:
             lista_df = []
             for i in range(len(self._indicadores)):
                 indicador = self._indicadores[i]
-                banco = self._bancos[i]
-                data = self.__obtener_json(indicador, banco)
+                try: banco = self._bancos[i]
+                except: banco = None
+                data, banco = self.__obtener_json(indicador, banco)
                 df = self.__json_a_df(data, banco)
                 if banco == 'BIE': df = df[::-1]
                 lista_df.append(df)

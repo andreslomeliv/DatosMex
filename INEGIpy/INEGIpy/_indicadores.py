@@ -8,17 +8,16 @@
 
 from ._indicador_general import IndicadorGeneral
 
-class INEGI(IndicadorGeneral):
+class Indicadores(IndicadorGeneral):
     
     def __init__(self, token):
         super().__init__(token)
         # atributos de la consulta general
         self.indicadores = list()
-        self.bancos = list()
         self.nombres = list()
 
     # Las variables de la consulta pueden ser definidos o redefinidos con los parámteros de la función
-    def obtener_df(self, indicadores = None, bancos = None, nombres = None, inicio = None, fin = None):
+    def obtener_df(self, indicadores = None, nombres = None, inicio = None, fin = None):
         """
         Regresa un DataFrame con la información de los indicadores proporcionada por el API del INEGI.
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
@@ -27,8 +26,6 @@ class INEGI(IndicadorGeneral):
         -----------
         indicadores: list/str. Lista con los indicadores de las series a obtener. También se puede especificar 
                     en INEGI.IndicadorGeneral.indicadores
-        bancos: list/str. Lista con los bancos donde se encuentran las series a obtener. También se puede especificar 
-                    en INEGI.IndicadorGeneral.bancos
         nombres: list/str. Lista con los nombres de las columas del DataFrame. De no proporcionarse, se usarán los indicadores.
                     También se puede especificar en INEGI.IndicadorGeneral.indicadores()
         inicio: str. Fecha donde iniciar la serie. También se puede especificar en INEGI.Indicador_General.definir_periodo()
@@ -39,15 +36,11 @@ class INEGI(IndicadorGeneral):
 
         """
         self._indicadores = self.indicadores
-        self._bancos = self.bancos
         self._columnas = self.nombres
         
         if indicadores: 
             self._indicadores = indicadores
             self.indicadores = indicadores
-        if bancos: 
-            self._bancos = bancos
-            self.bancos = bancos
         if nombres: 
             self._columnas = nombres
             self.nombres = nombres
