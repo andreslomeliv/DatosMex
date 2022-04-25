@@ -12,7 +12,8 @@ class DENUE:
     
     
     def __obtener_geodataframe(self, df): 
-        df['geometry'] = df[['Longitud','Latitud']].astype(float).values.tolist()
+        df[['Longitud','Latitud']] = df[['Longitud','Latitud']].astype(float)
+        df['geometry'] = df[['Longitud','Latitud']].values.tolist()
         df.geometry = df.geometry.apply(Point)
         geo_df = gpd.GeoDataFrame(df)
         geo_df.crs = 'EPSG:4326'
