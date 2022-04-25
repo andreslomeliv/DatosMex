@@ -49,7 +49,7 @@ pib.grafica()
 
 
     
-![png](output_7_0.png)
+![png](README_PNGs/output_7_0.png)
     
 
 
