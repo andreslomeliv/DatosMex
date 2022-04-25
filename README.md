@@ -46,7 +46,7 @@ Librería de Python para interactuar con el API del Sistema de Información Econ
 
 ### Clases:
 Una clase general para acceder a los indicadores proporcionados por el [catálogo de series](https://www.banxico.org.mx/SieAPIRest/service/v1/doc/catalogoSeries#) de Banxico.
-* Banxico_General
+* Banxico
 
 Además de un método general para obtener las series, se están desarrollando módulos particulares para los series de uso común, como:
 
