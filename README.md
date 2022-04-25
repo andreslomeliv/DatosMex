@@ -1,9 +1,9 @@
  # DatosMex
 Proyecto en Python orientado a la creación de librerías para el manejo de bases de datos abiertas en México.
-Actualmente se están desarrollando dos librerías: INEGIpy y BANXICOpy. La primera está dedicada a los APIs del INEGI: el Banco de Indicadores, el DENUE, el Servicio de Ruteo y el Catálogo de Claves Únicas Geoestadísticas o Marco Geoestadístico. La segunda está dedicada al API del Sistema de Inforamción Económica del Banco de México. 
+Actualmente se están desarrollando dos librerías: INEGIpy y BANXICOpy. La primera está dedicada a las APIs del INEGI: el Banco de Indicadores, el DENUE, el Servicio de Ruteo y el Catálogo de Claves Únicas Geoestadísticas o Marco Geoestadístico. La segunda está dedicada a la API del Sistema de Inforamción Económica del Banco de México. 
 
 ## INEGIpy
-Librería de Python para interactuar con el API del INEGI.
+Librería de Python para interactuar con las APIs del INEGI.
 
 ### Clases:
 
@@ -12,7 +12,7 @@ Librería de Python para interactuar con el API del INEGI.
 * **Ruteo:** clase para utilizar el [Servicio de Ruteo de México](http://gaia.inegi.org.mx/mdm6/?v=bGF0OjIzLjMyMDA4LGxvbjotMTAxLjUwMDAwLHo6MSxsOmMxMTFzZXJ2aWNpb3N8dGMxMTFzZXJ2aWNpb3M=).
 * **MarcoGeoestadistico:** clase para obtener la información de las [áreas geoestadísticas](https://www.inegi.org.mx/temas/mg/) que define el INEGI en el Censo de Población y Vivienda 2020.
 
-Además de un método general para obtener los indicadores económicos, se están desarrollando módulos particulares para los series de uso común, como:
+Además de una clase general para obtener los indicadores económicos, se están desarrollando clases particulares para los series de uso común, como:
 
 * PIB
 * Inflación (En desarrollo)
@@ -42,13 +42,13 @@ Las consultas ya generadas se mantienen guardadas en el mismo objeto para uso su
 Los indicadores se pueden obtener del [constructor de consultas](https://www.inegi.org.mx/servicios/api_indicadores.html) proporcionado por el INEGI.
 
 ## BANXICOpy
-Librería de Python para interactuar con el API del Sistema de Información Económica del Banco de México.
+Librería de Python para interactuar con la API del Sistema de Información Económica del Banco de México.
 
 ### Clases:
 Una clase general para acceder a los indicadores proporcionados por el [catálogo de series](https://www.banxico.org.mx/SieAPIRest/service/v1/doc/catalogoSeries#) de Banxico.
 * Banxico
 
-Además de un método general para obtener las series, se están desarrollando módulos particulares para los series de uso común, como:
+Además de una clase general para obtener las series, se están desarrollando clases particulares para los series de uso común, como:
 
 * Tipo de Cambio (En desarrollo)
 * Tasas de interés (En desarrollo)
