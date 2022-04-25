@@ -47,19 +47,9 @@ pib = PIB(token)
 pib.grafica()
 ```
 
-
-    
 ![png](README_PNGs/output_7_0.png)
     
-
-
-
-
-
-    (<Figure size 432x288 with 1 Axes>, <AxesSubplot:>)
-
-
-
+  
 ### DENUE, Ruteo y MarcoGeoestadistico
 
 #### Negocios a 5km de una coordenada
@@ -98,21 +88,9 @@ zocalo.crs = 'EPSG:4326' # como creamos la capa no tiene un CRS asociado
 zocalo = zocalo.to_crs('EPSG:6372') # este crs nos permite realizar operaciones en metros en vez de grados en Ciudad de México
 zocalo = pd.concat([zocalo, gpd.GeoDataFrame([zocalo.geometry.iloc[0].buffer(5000)], columns=['geometry'])], axis=0)
 zocalo.plot(alpha=0.6, color='green')
-```
+```    
 
-
-
-
-    <AxesSubplot:>
-
-
-
-
-    
-![png](output_13_1.png)
-    
-
-
+![png](README_PNGs/output_13_1.png)
 
 ```python
 # utilizamos el DENUE para obtener una capa con los establecimientos en un radio de 5 km 
@@ -124,20 +102,8 @@ ax = zocalo.plot(alpha=0.4, color='green')
 estabs.plot(ax=ax, alpha=0.4, color='red')
 ```
 
-
-
-
-    <AxesSubplot:>
-
-
-
-
+![png](README_PNGs/output_14_1.png)
     
-![png](output_14_1.png)
-    
-
-
-
 ```python
 # utilizamos el marco geostadistico para obtener la capa del area geografica sobre la que plotear
 # Si no conoces la clave de alguna entidad, municipio o localidad la puedes buscar por nombre en el marco geoestadístico
@@ -151,19 +117,7 @@ zocalo.plot(ax=ax, color='green', alpha=0.4)
 estabs.plot(ax=ax, color='red', alpha=0.4)
 ```
 
-
-
-
-    <AxesSubplot:>
-
-
-
-
-    
-![png](output_15_1.png)
-    
-
-
+![png](README_PNGs/output_15_1.png)
 
 ```python
 # reducimos a solo los municipios en el area
@@ -175,19 +129,7 @@ zocalo.plot(ax=ax, color='green', alpha=0.4)
 estabs.plot(ax=ax, color='red', alpha=0.4)
 ```
 
-
-
-
-    <AxesSubplot:>
-
-
-
-
-    
-![png](output_16_1.png)
-    
-
-
+![png](README_PNGs/output_16_1.png)
 
 ```python
 # ya podemos hacer operaciones y obtener datos como las distancias al punto definido:
@@ -195,9 +137,6 @@ estabs.plot(ax=ax, color='red', alpha=0.4)
 estabs['distancia_radial'] = estabs.geometry.distance(zocalo.geometry.iloc[0])
 estabs.head()
 ```
-
-
-
 
 <div>
 <style scoped>
@@ -366,9 +305,6 @@ estabs.head()
 <p>5 rows × 24 columns</p>
 </div>
 
-
-
-
 ```python
 # podemos ver que la distancia mínima son 300 metros, la máxima es cercana a los 5 km y la media es de 3.1 km
 
@@ -392,21 +328,9 @@ ax = muns.plot(alpha = 0.5, figsize=(8,8))
 zocalo.plot(ax=ax, color='green', alpha=0.4)
 estabs.plot(ax=ax, alpha=0.4, column='distancia_radial', legend = True, legend_kwds={'label':'Distancia (m)','orientation':"horizontal"})
 ```
-
-
-
-
-    <AxesSubplot:>
-
-
-
-
+   
+![png](README_PNGs/output_19_1.png)
     
-![png](output_19_1.png)
-    
-
-
-
 ```python
 # podemos mejorar el mapa si usamos un nivel de agregación menor
 
@@ -419,20 +343,8 @@ zocalo.plot(ax=ax, color='green', alpha=0.1, zorder=2)
 estabs.plot(ax=ax, alpha=0.6, column='distancia_radial',
             legend = True, legend_kwds={'label':'Distancia (m)','orientation':"horizontal"}, zorder=3)
 ```
-
-
-
-
-    <AxesSubplot:>
-
-
-
-
-    
-![png](output_20_1.png)
-    
-
-
+  
+![png](README_PNGs/output_20_1.png)
 
 ```python
 # para mejorar el mapa también podemos plotear las vialidades
@@ -449,19 +361,8 @@ estabs.plot(ax=ax, alpha=0.9, column='distancia_radial', cmap='Reds',
             legend = True, legend_kwds={'label':'Distancia (m)','orientation':"horizontal"},zorder=4)
 ```
 
-
-
-
-    <AxesSubplot:>
-
-
-
-
+![png](README_PNGs/output_21_1.png)
     
-![png](output_21_1.png)
-    
-
-
 ##### Distancia en ruta
 
 
@@ -483,9 +384,6 @@ ruteo = Ruteo(token_ruteo)
 linea_i =  ruteo.BuscarLinea(lat, lng)
 linea_i
 ```
-
-
-
 
 <div>
 <style scoped>
@@ -524,9 +422,6 @@ linea_i
   </tbody>
 </table>
 </div>
-
-
-
 
 ```python
 # Para calcular una ruta se requiere la utilizar la función BuscarLinea (o BuscarDestino dependiendo de lo que se busca) con el fin de obtener la línea final de la ruta
@@ -677,16 +572,7 @@ vialidades.plot(ax=ax, color='white', alpha=0.3, zorder=2)
 estabs[estabs.distancia_ruta <= 5].plot(ax=ax, alpha=0.9, column='distancia_ruta', cmap='Reds',
             legend = True, legend_kwds={'label':'Distancia (Km)','orientation':"horizontal"},zorder=4)
 ```
-
-
-
-
-    <AxesSubplot:>
-
-
-
-
-    
-![png](output_30_1.png)
+   
+![png](README_PNGs/output_30_1.png)
     
 
