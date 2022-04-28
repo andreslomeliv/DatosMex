@@ -15,8 +15,8 @@ Librería de Python para interactuar con las APIs del INEGI.
 Además de una clase general para obtener los indicadores económicos, se están desarrollando clases particulares para los series de uso común, como:
 
 * PIB
-* Inflación (En desarrollo)
-* Desocupación (En desarrollo)
+* Inflación 
+* Desocupación 
 
 ### Uso:
 ```python
@@ -50,9 +50,9 @@ Una clase general para acceder a los indicadores proporcionados por el [catálog
 
 Además de una clase general para obtener las series, se están desarrollando clases particulares para los series de uso común, como:
 
-* Tipo de Cambio (En desarrollo)
-* Tasas de interés (En desarrollo)
-* Balaza de pagos (En desarrollo)
+* Tipo de Cambio 
+* Tasas de interés 
+* Balaza de pagos 
 
 ### Uso:
 ```python
