@@ -10,17 +10,17 @@ class MarcoGeoestadistico:
     # uiliza la liga/url para obtener el geojson y pasarlo a un geodataframe
     def __obtener_df(self, liga, as_gdf):
         req = requests.get(liga)
-        assert req.status_code == 200, 'No se encontró información con las parámetros especificados.'
+        assert req.status_code == 200, 'No se encontró información con las parámetros especificados. \n Liga: {}'.format(liga)
         data =  json.loads(req.text)
         if as_gdf: 
             try: 
                 gdf = gpd.GeoDataFrame.from_features(data["features"])
                 gdf.crs = 'EPSG:4326'
                 return gdf
-            except: raise Exception('No se encontró información con las parámetros especificados.')
+            except: raise Exception('No se encontró información con las parámetros especificados. \n Liga: {}'.format(liga))
         else: 
             try: return pd.DataFrame.from_dict(data['datos'])
-            except: raise Exception('No se encontró información con las parámetros especificados.')
+            except: raise Exception('No se encontró información con las parámetros especificados. \n Liga: {}'.format(liga))
     
     # construye la liga y la lista de entidades
     # se tiene que ver la mejor fórma de usar esta función para entidades más desagregadas:
@@ -74,6 +74,7 @@ class MarcoGeoestadistico:
         return clave
                 
     def __obtener_consulta(self, liga, areas_geoestadisticas, as_gdf, ambito = None):
+        if ambito not in ['rural','urbano', 'r','u',None]: raise Exception('El ámbito proporcionado no es correcto.') 
         dfs = list()
         if areas_geoestadisticas: 
             for area in areas_geoestadisticas: 
@@ -82,7 +83,7 @@ class MarcoGeoestadistico:
                 df = self.__obtener_df(liga_final, as_gdf)
                 dfs.append(df)
             c_df = pd.concat(dfs, axis = 0)
-            return c_df
+            return c_df.reset_index(drop = True)
         else:
             return self.__obtener_df(liga, as_gdf)
     
@@ -95,7 +96,7 @@ class MarcoGeoestadistico:
         Parámetros:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
-        nombres: str/list. Nombre(s) de los estados a buscar.
+        nombres: str/list. Nombre(s) de los estados a buscar.Si se define este parámetro obtiene las áreas geoestadísticas estatales cuyo nombre contenga el texto proporcionado sin necesidad de proporcionar las claves de las entidades. No distingue entre mayúsculas y minúsculas pero sí considera acentos.
         as_geodf: bool. Si el valor es verdadero regresa un GeoDataFrame para facilitar el análisis espacial. 
         -----------
         
@@ -112,15 +113,15 @@ class MarcoGeoestadistico:
         '''
         Obtiene el DataFrame con las áreas geoestadísticas municipales.
         
-        Si no se especifícan los parámetros regresa un DataFrame con todos los municipios de México. 
+        Si no se especifícan los parámetros regresa un DataFrame con todos los municipios de México.
         
-        Nota: si se pasa una lista de áreas con nivel de agregación menor al municipal no se puede definir un municipio en específico a buscar. En este caso se regresan todos los municipios de la lista de entidades. 
+        Nota: si se pasa una lista de entidades no se puede definir un municipio en específico a buscar. En este caso se regresan todos los municipios de la lista de entidades.
         
         Parámetros:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
-        municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001)
-        nombres: str/list. Nombre(s) de los municipios a buscar.
+        municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001).
+        nombres: str/list. Nombre(s) de los municipios a buscar. Si se define este parámetro obtiene las áreas geoestadísticas municipales cuyo nombre contenga el texto proporcionado sin necesidad de proporcionar las claves de los municipios. No distingue entre mayúsculas y minúsculas pero sí considera acentos.
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         as_geodf: bool. Si el valor es verdadero regresa un GeoDataFrame para facilitar el análisis espacial. 
         -----------
@@ -142,14 +143,12 @@ class MarcoGeoestadistico:
         
         Nota: si se pasa una lista de áreas con nivel de agregación menor a la localidad no se puede definir una localidad en específico a buscar. En este caso se regresan todos las localidades de los niveles previos. 
         
-        Tampoco se puede difinir un nivel de agregación sin definir el nivel previo. No se puede definir un municipio sin definir una entidad, etc.
-        
         Parámetros:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
         municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001)
-        loacalidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001 )
-        nombres: str/list. Nombre(s) de las localidades a buscar.
+        localidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001 )
+        nombres: str/list. Nombre(s) de las localidades a buscar. Si se define este parámetro obtiene las localidades amanzanadas cuyo nombre contenga el texto proporcionado sin necesidad de proporcionar las claves de las localidades. No distingue entre mayúsculas y minúsculas pero sí considera acentos.
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         ambito: str. ['urbano'|'rural'] Define el ambito de las localidades. Si se define un ámbito no se puede definir una localidad en específico y se debe definir tanto entidad como municipio.
         as_geodf: bool. Si el valor es verdadero regresa un GeoDataFrame para facilitar el análisis espacial. 
@@ -161,9 +160,11 @@ class MarcoGeoestadistico:
         
         '''
         if ambito: claves = self.__obtener_claves(entidades, municipios, localidades, None, claves_concatenadas)
-        else: claves = self.__obtener_claves(entidades, municipios, localidades, claves_concatenadas, False)
-        liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'localidades/pol', as_geodf)
-        return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf, ambito)
+        else: claves = self.__obtener_claves(entidades, municipios, localidades, None, claves_concatenadas, False)
+        liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'localidades/pol', True)
+        df = self.__obtener_consulta(liga, areas_geoestadisticas, True, ambito)
+        if as_geodf is False: df = pd.DataFrame(df.drop('geometry',axis=1))
+        return df
     
     def LocalidadesRuralesPuntuales(self, entidades = None, municipios = None, localidades = None, nombres = None, claves_concatenadas = None, as_geodf = True):
         '''
@@ -173,14 +174,12 @@ class MarcoGeoestadistico:
         
         Nota: si se pasa una lista de áreas con nivel de agregación menor a la localidad no se puede definir una localidad en específico a buscar. En este caso se regresan todos las localidades de los niveles previos. 
         
-        Tampoco se puede difinir un nivel de agregación sin definir el nivel previo. No se puede definir un municipio sin definir una entidad, etc.
-        
         Parámetros:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
         municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001)
         loacalidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001 )
-        nombres: str/list. Nombre(s) de las localidades a buscar.
+        nombres: str/list. Nombre(s) de las localidades a buscar. Si se define este parámetro obtiene las localidades amanzanadas cuyo nombre contenga el texto proporcionado sin necesidad de proporcionar las claves de las localidades. No distingue entre mayúsculas y minúsculas pero sí considera acentos.
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         as_geodf: bool. Si el valor es verdadero regresa un GeoDataFrame para facilitar el análisis espacial. 
         -----------
@@ -191,16 +190,16 @@ class MarcoGeoestadistico:
         
         '''
         claves = self.__obtener_claves(entidades, municipios, localidades, None, claves_concatenadas, False)
-        liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'localidades/ruralespto', as_geodf)
-        return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
+        liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'localidades/ruralespto', True)
+        df = self.__obtener_consulta(liga, areas_geoestadisticas, True, ambito)
+        if as_geodf is False: df = pd.DataFrame(df.drop('geometry',axis=1))
+        return df
     
     def AGEBs(self, entidades = None, municipios = None, localidades = None, agebs = None, claves_concatenadas = None, ambito = 'urbano', as_geodf = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas a nivel Área Geoestadística Básica. 
         
         Nota: si se pasa una lista de áreas con nivel de agregación menor al AGEB no se puede definir una localidad en específico a buscar. En este caso se regresan todos los AGEBs de los niveles previos. 
-        
-        Tampoco se puede difinir un nivel de agregación sin definir el nivel previo. No se puede definir un municipio sin definir una entidad, etc.
         
         Parámetros:
         -----------
@@ -254,7 +253,7 @@ class MarcoGeoestadistico:
         liga, areas_geoestadisticas = self.__liga_y_areas(None, claves, 'mza', as_geodf)
         return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf, ambito)
     
-    def Vialidades(self, entidades, municipios, localidades = None, claves_concatenadas = None, as_geodf = True):
+    def Vialidades(self, entidades = None, municipios = None, localidades = None, claves_concatenadas = None, as_geodf = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas a nivel vialidad.
         

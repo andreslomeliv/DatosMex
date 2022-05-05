@@ -1,5 +1,6 @@
 import requests
 import json
+import numpy as np
 import pandas as pd
 from pandas import DataFrame
 import geopandas as gpd
@@ -23,13 +24,13 @@ class Ruteo:
         if as_geodf:
             df['geometry'] = df['geojson'].apply(lambda x: shape(json.loads(x)))
             df = df.drop('geojson', axis=1)
-            return gpd.GeoDataFrame(df)
+            df = gpd.GeoDataFrame(df)
+            df.crs = 'EPSG:4326'
+            return df
         return df
         
     def BuscarDestino(self, busqueda: str, cantidad: int, proyeccion: str = 'GRS80'): 
         '''
-        Obtiene un GeoDataFrame con la información de los destinos registrados en la Red Nacional de Caminos. 
-        
         Permite buscar destinos como localidades urbanas y rurales, así como los sitios de interés que pueden ser instalaciones de servicios como aeropuertos, puertos, servicios médicos, centros educativos de nivel superior, así como sitios atractivos para el turismo como playas, cascadas, zonas arqueológicas, museos, pueblos mágicos, y más.
         
         Parámetros:
@@ -38,6 +39,8 @@ class Ruteo:
         cantidad: int. Número de destinos que se desea obtener. 
         proyeccion: str. Define la proyección de los puntos resultantes. GRS80 para coordenadas geográficas y MERC para coordenadas Spherical Mercator. Por default será GRS80. 
         -----------
+        
+        Obtiene un GeoDataFrame con la información de los destinos registrados en la Red Nacional de Caminos. 
 
         Para más información consultar: https://www.inegi.org.mx/servicios/Ruteo/Default.html#token
 
@@ -102,7 +105,7 @@ class Ruteo:
             if isinstance(destino_final, DataFrame): params['dest_f'] = destino_inicial['id_dest']
             else: params['dest_f'] = destino_final
         if saltar_lineas is not None: params['b'] = ','.join(saltar_lineas)
-                        
+        
         return self.__obtener_consulta(funcion, params)
     
     def CalcularRuta(self, linea_inicial = None, linea_final = None, destino_inicial = None, destino_final = None, tipo_vehiculo: int = 0, 
@@ -117,8 +120,8 @@ class Ruteo:
         destino_inicial: DataFrame con la columna id_dest del destino inicial obtenido por la función BuscarDestino. También acepta el valor de id_dest en string o integer. 
         destino_final: DataFrame con la columna id_dest del destino final obtenido por la función BuscarDestino. También acepta el valor de id_dest en string o integer. 
         tipo_vehiculo: int. Clave con el tipo de vehículo. Por default es 0 que equivale a motocicleta mientras que 1 equivale a automóvil. Para consultar los demás valores se debe revisar la guía de desarrolladores en: https://www.inegi.org.mx/servicios/Ruteo/Default.html#token
-        ruta: str. Tipo de ruta que se desea obtener: optima, libre o cuota. 
-        ejes_excedentes: Número de ejes excedentes del vehículo. Por default es 0 que equivale a ningíun eje excedente. Para consultar los demás valores se debe revisar la guía de desarrolladores en: https://www.inegi.org.mx/servicios/Ruteo/Default.html#token
+        ruta: str. ['optima' | 'libre' | 'cuota']. Tipo de ruta que se desea obtener. 
+        ejes_excedentes: int. Número de ejes excedentes del vehículo. Por default es 0 que equivale a ningíun eje excedente. Para consultar los demás valores se debe revisar la guía de desarrolladores en: https://www.inegi.org.mx/servicios/Ruteo/Default.html#token
         saltar_lineas: list. Lista con los id_routing_net de las líneas por las cuales la ruta no pasará por algún motivo. Por default es None.
         proyeccion: str. Define la proyección de los puntos resultantes. GRS80 para coordenadas geográficas y MERC para coordenadas Spherical Mercator. Por default será GRS80. 
         -----------
@@ -127,7 +130,10 @@ class Ruteo:
 
         '''
 
-        return self.__obtener_ruta(linea_inicial, linea_final, destino_inicial, destino_final, tipo_vehiculo, ruta, ejes_excedentes, saltar_lineas, proyeccion, '')
+        ruta = self.__obtener_ruta(linea_inicial, linea_final, destino_inicial, destino_final, tipo_vehiculo, ruta, ejes_excedentes, saltar_lineas, proyeccion, '')
+        ruta['peaje'] = np.select([ruta.peaje == 'f'],[False], True)
+        
+        return ruta
     
     def DetalleRuta(self, linea_inicial = None, linea_final = None, destino_inicial = None, destino_final = None, tipo_vehiculo: int = 0, 
                      ruta: str = 'optima', ejes_excedentes: int = 0, saltar_lineas = None, proyeccion: str = 'GRS80'):
@@ -141,8 +147,8 @@ class Ruteo:
         destino_inicial: DataFrame con la columna id_dest del destino inicial obtenido por la función BuscarDestino. También acepta el valor de id_dest en string o integer. 
         destino_final: DataFrame con la columna id_dest del destino final obtenido por la función BuscarDestino. También acepta el valor de id_dest en string o integer. 
         tipo_vehiculo: int. Clave con el tipo de vehículo. Por default es 0 que equivale a motocicleta mientras que 1 equivale a automóvil. Para consultar los demás valores se debe revisar la guía de desarrolladores en: https://www.inegi.org.mx/servicios/Ruteo/Default.html#token
-        ruta: str. Tipo de ruta que se desea obtener: optima, libre o cuota. 
-        ejes_excedentes: Número de ejes excedentes del vehículo. Por default es 0 que equivale a ningíun eje excedente. Para consultar los demás valores se debe revisar la guía de desarrolladores en: https://www.inegi.org.mx/servicios/Ruteo/Default.html#token
+        ruta: str. ['optima' | 'libre' | 'cuota']. Tipo de ruta que se desea obtener. 
+        ejes_excedentes: int. Número de ejes excedentes del vehículo. Por default es 0 que equivale a ningíun eje excedente. Para consultar los demás valores se debe revisar la guía de desarrolladores en: https://www.inegi.org.mx/servicios/Ruteo/Default.html#token
         saltar_lineas: list. Lista con los id_routing_net de las líneas por las cuales la ruta no pasará por algún motivo. Por default es None.
         proyeccion: str. Define la proyección de los puntos resultantes. GRS80 para coordenadas geográficas y MERC para coordenadas Spherical Mercator. Por default será GRS80. 
         -----------
