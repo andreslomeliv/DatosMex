@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import requests
 import json
+from typing import Union
 
 class IndicadorGeneral:
     
@@ -18,11 +19,7 @@ class IndicadorGeneral:
         # vriables para la consulta
         self._indicadores = list() # lista con los indicadores a consultar. cada módulo la llena con sus especificaciones
         self._bancos = list() # lista con los bancos de los indicadores
-        self.inicio = None # fecha de inicio de la serie
-        self.fin = None # fecha de fin de la serie
-        self._df = None # atributo interno con el último DataFrame consultado. Evita llamar al API si no cambiaron los indicadores
         self._columnas = list() # nombres de las columnas. En los módulos de series se llena automáticamente.
-        self._indicadores_previos = list() # lista con indicadores previos. Evita llamar al API si no cambiaron los indicadores.
         # diccionario con la clave de frecuencia del INEGI y el factor por el cual se debe multiplicar
         # el último valor para pasarlo a su mes correspondiente
         # Ejemplo: una serie semestral tiene como clave de frecuencia '4', esto indica que para cada año van
@@ -123,29 +120,26 @@ class IndicadorGeneral:
     # en este módulo solo se definen inicio y fin como variables ya que son las únicas que necesariamente están en
     # cada módulo. El resto de las variables se van definiendo en los módulos que hereden esta clase. 
     def obtener_df(self, inicio, fin):
-        if inicio: self.inicio = inicio
-        if fin: self.fin = fin
         
         if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
         if isinstance(self._bancos, str): self._bancos = [self._bancos]
-
-        if self._df is None or self._indicadores != self._indicadores_previos:
-            self._indicadores_previos = self._indicadores
-            lista_df = []
-            for i in range(len(self._indicadores)):
-                indicador = self._indicadores[i]
-                try: banco = self._bancos[i]
-                except: banco = None
-                data, banco = self.__obtener_json(indicador, banco)
-                df = self.__json_a_df(data, banco)
-                if banco == 'BIE': df = df[::-1]
-                lista_df.append(df)
+        if len(self._columnas) == 0: self._columnas = self._indicadores
+        if isinstance(self._columnas, str): self._columnas = [self._columnas]
         
-            df = pd.concat(lista_df,axis=1)
-            df.columns = self._columnas
-            self._df = df
+        lista_df = []
+        for i in range(len(self._indicadores)):
+            indicador = self._indicadores[i]
+            try: banco = self._bancos[i]
+            except: banco = None
+            data, banco = self.__obtener_json(indicador, banco)
+            df = self.__json_a_df(data, banco)
+            if banco == 'BIE': df = df[::-1]
+            lista_df.append(df)
 
-        return self._df[self.inicio:self.fin] 
+        df = pd.concat(lista_df,axis=1)
+        df.columns = self._columnas
+
+        return df[inicio:fin] 
 
 ##################### Graficar #######################
 
@@ -153,58 +147,58 @@ class IndicadorGeneral:
 # por default utiliza la última consulta generada o definida aunque se puede redefinir variables de la consulta 
 # dentro de la función.
 
-    def __cambiar_lineas(self, ax, estilo):
-        if estilo == 'color':
-            self.__cambiar_colores(ax)
-        if estilo == 'ByN':
-            self.__cambiar_estilos(ax)
-        else: raise Exception('El estilo no coincide. Solo existe "color" y "ByN".')
-        ax.legend(self._columnas)
+#    def __cambiar_lineas(self, ax, estilo):
+ #       if estilo == 'color':
+  #          self.__cambiar_colores(ax)
+   #     if estilo == 'ByN':
+    #        self.__cambiar_estilos(ax)
+     #   else: raise Exception('El estilo no coincide. Solo existe "color" y "ByN".')
+      #  ax.legend(self._columnas)
 
-    def __cambiar_estilos(self, ax):
-        # checar cuál es la mejor manera de elejir los estilos
-        line_styles = ['-','-.','--',':']
-        markers = ['o','v','s','x','D']
-        for i, line in enumerate(ax.get_lines()):
-            if i <= 3: line.set_linestyle(line_styles[i])
-            else: line.set_marker(markers[i-4])
+ #   def __cambiar_estilos(self, ax):
+  #      # checar cuál es la mejor manera de elejir los estilos
+   #     line_styles = ['-','-.','--',':']
+    #    markers = ['o','v','s','x','D']
+     #   for i, line in enumerate(ax.get_lines()):
+      #      if i <= 3: line.set_linestyle(line_styles[i])
+       #     else: line.set_marker(markers[i-4])
 
-    def __cambiar_colores(self, ax):
-        palette = sns.color_palette('colorblind',len(self._columnas))[::-1]
-        for i, line in enumerate(ax.get_lines()):
-            line.set_color(palette[i])
+ #   def __cambiar_colores(self, ax):
+  #      palette = sns.color_palette('colorblind',len(self._columnas))[::-1]
+   #     for i, line in enumerate(ax.get_lines()):
+    #        line.set_color(palette[i])
 
-    def grafica(self, estilo: str = 'color', show: bool = True, filename: str = None, **kwargs):
+ #   def grafica(self, estilo: str = 'color', show: bool = True, filename: str = None, **kwargs):
         """
         Construye un gráfico con la consulta definida. En caso de querer cambiar la consulta se pueden indicar los parámetros deseados: inicio, fin, indicador, serie, o cualquiera de los parámetros particulares de la serie.
 
         NOTA:
         Esta función no pretende remplazar el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar estilos de gráficas que puedan ser de uso común. Por ello, la gráfica generada tiene solo ciertos estilos disponibles. 
-        Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas directamente con los datos o para manipular los objetos fig y ax que regresa esta función. 
-
-        Parámetros
-        -----------
-        estilo -- str. Estilo de la gráfica. Actualmente solo existen dos estilos: "color" y "ByN".
-        show -- bool. Define si mostrar o no la gráfica. Equivalente a plt.show()
-        filename -- nombre y dirección donde guardar la gráfica. Equivalente a plt.savefig()
-        -----------
-
-        Regresa los objetos fig y ax de matplotlib con la gráfica generada. 
-
-        """
-        df = self.obtener_df(**kwargs)
-        color = 'blue' if estilo == 'color' else 'black'
-        fig, ax = plt.subplots()
-        df.plot(ax=ax,color=color)
-        ax.legend().remove()
-        if len(self._df.columns)>1: self.__cambiar_lineas(ax, estilo)
-        sns.despine()
-        ax.set_xlabel('')
-        ax.ticklabel_format(style='plain',axis='y')
-        plt.tight_layout()
+ #       Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas directamente con los datos o #para manipular los objetos fig y ax que regresa esta función. 
+#
+ #       Parámetros
+#        -----------
+    #    estilo -- str. Estilo de la gráfica. Actualmente solo existen dos estilos: "color" y "ByN".
+   #     show -- bool. Define si mostrar o no la gráfica. Equivalente a plt.show()
+  #      filename -- nombre y dirección donde guardar la gráfica. Equivalente a plt.savefig()
+ #       -----------
+#
+ #       Regresa los objetos fig y ax de matplotlib con la gráfica generada. 
+#
+#        """
+#        df = self.obtener_df(**kwargs)
+#        color = 'blue' if estilo == 'color' else 'black'
+#        fig, ax = plt.subplots()
+#        df.plot(ax=ax,color=color)
+#        ax.legend().remove()
+#        if len(self._df.columns)>1: self.__cambiar_lineas(ax, estilo)
+#        sns.despine()
+#        ax.set_xlabel('')
+#        ax.ticklabel_format(style='plain',axis='y')
+#        plt.tight_layout()
         
-        if show: plt.show()
-        if filename: plt.savefig(filename)
-        return fig, ax
+  #      if show: plt.show()
+ #       if filename: plt.savefig(filename)
+ #       return fig, ax
 
     
