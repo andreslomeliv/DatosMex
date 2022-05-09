@@ -89,9 +89,9 @@ class MarcoGeoestadistico:
             return self.__obtener_df(liga, as_gdf)
     
     def Entidades(self, 
-                  entidades = None, 
-                  nombres = None, 
-                  as_geodf = True):
+                  entidades: 'str|list' = None, 
+                  nombres: 'str|list' = None, 
+                  as_geodf: bool = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas estatales.
         
@@ -114,11 +114,11 @@ class MarcoGeoestadistico:
     
     # esta requiere llamar la función concatenadora
     def Municipios(self, 
-                   entidades = None, 
-                   municipios = None, 
-                   nombres = None, 
-                   claves_concatenadas = None, 
-                   as_geodf = True):
+                   entidades: 'str|list' = None, 
+                   municipios: 'str|list' = None, 
+                   nombres: 'str|list' = None, 
+                   claves_concatenadas: 'str|list' = None, 
+                   as_geodf: bool = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas municipales.
         
@@ -145,13 +145,13 @@ class MarcoGeoestadistico:
         return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
     
     def LocalidadesAmanzanadas(self, 
-                               entidades = None, 
-                               municipios = None, 
-                               localidades = None, 
-                               nombres = None, 
-                               claves_concatenadas = None, 
-                               ambito = None, 
-                               as_geodf = True):
+                               entidades: 'str|list' = None, 
+                               municipios: 'str|list' = None, 
+                               localidades: 'str|list' = None, 
+                               nombres: 'str|list' = None, 
+                               claves_concatenadas: 'str|list' = None, 
+                               ambito: str = None, 
+                               as_geodf: bool = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas a nivel localidad amanzanada.
         
@@ -183,12 +183,12 @@ class MarcoGeoestadistico:
         return df
     
     def LocalidadesRuralesPuntuales(self, 
-                                    entidades = None, 
-                                    municipios = None, 
-                                    localidades = None, 
-                                    nombres = None, 
-                                    claves_concatenadas = None, 
-                                    as_geodf = True):
+                                    entidades: 'str|list' = None, 
+                                    municipios: 'str|list' = None, 
+                                    localidades: 'str|list' = None, 
+                                    nombres: 'str|list' = None, 
+                                    claves_concatenadas: 'str|list' = None, 
+                                    as_geodf: bool = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas a nivel localidad rural puntual.
         
@@ -218,13 +218,13 @@ class MarcoGeoestadistico:
         return df
     
     def AGEBs(self, 
-              entidades = None, 
-              municipios = None, 
-              localidades = None, 
-              agebs = None, 
-              claves_concatenadas = None, 
-              ambito = 'urbano', 
-              as_geodf = True):
+              entidades: 'str|list' = None, 
+              municipios: 'str|list' = None, 
+              localidades: 'str|list' = None, 
+              agebs: 'str|list' = None, 
+              claves_concatenadas: 'str|list' = None, 
+              ambito: str = 'urbano', 
+              as_geodf: bool = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas a nivel Área Geoestadística Básica. 
         
@@ -255,7 +255,13 @@ class MarcoGeoestadistico:
         
         
     
-    def Manzanas(self, entidades = None, municipios = None, localidades = None, claves_concatenadas = None, ambito = None, as_geodf = True):
+    def Manzanas(self, 
+                 entidades: 'str|list' = None,
+                 municipios: 'str|list' = None, 
+                 localidades: 'str|list' = None, 
+                 claves_concatenadas: 'str|list' = None, 
+                 ambito: str = None, 
+                 as_geodf: bool = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas a nivel manzana. 
         
@@ -282,7 +288,12 @@ class MarcoGeoestadistico:
         liga, areas_geoestadisticas = self.__liga_y_areas(None, claves, 'mza', as_geodf)
         return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf, ambito)
     
-    def Vialidades(self, entidades = None, municipios = None, localidades = None, claves_concatenadas = None, as_geodf = True):
+    def Vialidades(self, 
+                   entidades: 'str|list' = None, 
+                   municipios: 'str|list' = None, 
+                   localidades: 'str|list' = None, 
+                   claves_concatenadas: 'str|list' = None, 
+                   as_geodf: bool = True):
         '''
         Obtiene el DataFrame con las áreas geoestadísticas a nivel vialidad.
         

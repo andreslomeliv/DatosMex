@@ -8,9 +8,8 @@ class DENUE:
     def __init__(self, token):
         self.__token = token
         self.__liga_base = 'https://www.inegi.org.mx/app/api/denue/v1/consulta/'
-        self.__df = None
     
-    
+    # realiza las transformaciones necesarias para hacer iun geodataframe
     def __obtener_geodataframe(self, df): 
         df[['Longitud','Latitud']] = df[['Longitud','Latitud']].astype(float)
         df['geometry'] = df[['Longitud','Latitud']].values.tolist()
@@ -21,6 +20,7 @@ class DENUE:
      
     #ahorita parece que no vale la pena esta funcion pero tal vez sirva más en el futuro
     #su punto es estandarizar los strings para de nombres o ramas economicas etc
+    # al final parece que esta función sí es totalmente inútil
     def __estadarizar_string(self, s): 
         s = s.lower().strip()
         return s
@@ -34,7 +34,12 @@ class DENUE:
         if as_geodf: df = self.__obtener_geodataframe(df)
         return df
         
-    def Buscar(self, condiciones, latitud: float, longitud: float, distancia: int, as_geodf: bool = True):
+    def Buscar(self, 
+               condiciones: 'str|lsit', 
+               latitud: float, 
+               longitud: float, 
+               distancia: int, 
+               as_geodf: bool = True):
         ''' 
         Realiza una consulta de todos los establecimientos que cumplan las condiciones definidas.
         Esta función permite obtener la información de los establecimientos registrados en el DENUE dentro de un área definida de acuerdo con una lista de condiciones.
@@ -61,7 +66,9 @@ class DENUE:
         return self.__obtener_consulta(liga, as_geodf)
         
     
-    def Ficha(self, clave: str, as_geodf: bool = True):
+    def Ficha(self, 
+              clave: str, 
+              as_geodf: bool = True):
         ''' 
         Obtiene la información de un establecimiento en específico.
         
@@ -79,7 +86,12 @@ class DENUE:
         liga = self.__liga_base + 'Ficha/{}/{}'.format(clave, self.__token)
         return self.__obtener_consulta(liga, as_geodf)
     
-    def Nombre(self, nombre: str, entidad: str = '00', registro_inicial: int = 1, registro_final: int = 10, as_geodf: bool = True):
+    def Nombre(self, 
+               nombre: str, 
+               entidad: str = '00', 
+               registro_inicial: int = 1, 
+               registro_final: int = 10, 
+               as_geodf: bool = True):
         ''' 
         Realiza una consulta de todos los establecimientos por nombre o razón social.
         
@@ -101,7 +113,12 @@ class DENUE:
         liga = self.__liga_base + 'Nombre/{}/{}/{}/{}/{}'.format(nombre, entidad, str(registro_inicial), str(registro_final), self.__token)
         return self.__obtener_consulta(liga, as_geodf)
     
-    def BuscarEntidad(self, condiciones, entidad: str = '00', registro_inicial: int = 1, registro_final: int = 10, as_geodf: bool = True):
+    def BuscarEntidad(self, 
+                      condiciones: 'str|list', 
+                      entidad: str = '00', 
+                      registro_inicial: int = 1, 
+                      registro_final: int = 10, 
+                      as_geodf: bool = True):
         ''' 
         Realiza una consulta de todos los establecimientos que cumplan las condiciones definidas y puede ser acotada por entidad federativa.
         
@@ -125,6 +142,8 @@ class DENUE:
         liga = self.__liga_base + 'BuscarEntidad/{}/{}/{}/{}/{}'.format(condiciones, entidad, str(registro_inicial), str(registro_final), self.__token)
         return self.__obtener_consulta(liga, as_geodf)
     
+    # sirve para pasar de claves concatenadas de area y actividad económica a su versión separada para la consulta
+    # evita que se llenen un montón de parámteros y simplifica las siguientes funciones
     def __desconcatenador(self, clave_area, clave_actividad):
         # para clave de area
         entidad = clave_area[:2] if len(clave_area[:2]) != 0 else '00'
@@ -141,12 +160,17 @@ class DENUE:
         
         return (entidad, municipio, localidad, ageb, manzana), (sector, subsector, rama, clase)
 
-    def BuscarAreaAct(self, nombre: str, clave_area: str = '', clave_actividad: str = '', registro_inicial: int = 1, registro_final: int = 10, 
-                          clave_establecimiento: str = '0', estrato: str = '0', as_geodf: bool = True):
+    def BuscarAreaAct(self, 
+                      nombre: str, 
+                      clave_area: str = '', 
+                      clave_actividad: str = '', 
+                      registro_inicial: int = 1, 
+                      registro_final: int = 10,  
+                      clave_establecimiento: str = '0', 
+                      estrato: str = '0', 
+                      as_geodf: bool = True):
         ''' 
         Realiza una consulta de todos los establecimientos con la opción de acotar la búsqueda por área geográfica, actividad económica, nombre, clave del establecimiento y estrato económico.
-        
-        El INEGI divide esta función en dos: BuscarAreaAct y BuscarAreaActEstr. La diferencia entre ambas es que la segunda permite definir el estrato económico de los establecimientos y la primera no. Sin embargo, la segunda función permite la opción de buscar para todos los estratos cuando esta variable es igual a '0' lo cual hace que los resultados de ambas funciones sean iguales. Es por ello que en esta clase solo se definió un método para la segunda función ya que esta es más general y puede regresar los mismos resultados que la primera. A pesar de esto se conserva el nombre de la primera función por facilidad. 
         
         Parámetros:
         ------------
@@ -194,7 +218,10 @@ class DENUE:
                                                                                                           clave_establecimiento, estrato, self.__token)
         return self.__obtener_consulta(liga, as_geodf)
 
-    def Cuantificar(self, clave_area = '0', clave_actividad = '0', estrato = '0'):
+    def Cuantificar(self, 
+                    clave_area: 'str|list' = '0',
+                    clave_actividad: 'str|list' = '0', 
+                    estrato: str = '0'):
         ''' 
         Realiza un conteo de todos los establecimientos con la opción de acotar la búsqueda por área geográfica, actividad económica y estrato.
         

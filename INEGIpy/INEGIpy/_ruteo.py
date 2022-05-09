@@ -29,7 +29,10 @@ class Ruteo:
             return df
         return df
         
-    def BuscarDestino(self, busqueda: str, cantidad: int, proyeccion: str = 'GRS80'): 
+    def BuscarDestino(self, 
+                      busqueda: str, 
+                      cantidad: int, 
+                      proyeccion: str = 'GRS80'): 
         '''
         Permite buscar destinos como localidades urbanas y rurales, así como los sitios de interés que pueden ser instalaciones de servicios como aeropuertos, puertos, servicios médicos, centros educativos de nivel superior, así como sitios atractivos para el turismo como playas, cascadas, zonas arqueológicas, museos, pueblos mágicos, y más.
         
@@ -52,7 +55,11 @@ class Ruteo:
                   'proj':proyeccion}
         return self.__obtener_consulta('buscadestino', params)
     
-    def BuscarLinea(self, lat: float, lng: float, escala: int = 1_000_000, proyeccion: str = 'GRS80'):
+    def BuscarLinea(self, 
+                    lat: float, 
+                    lng: float, 
+                    escala: int = 1_000_000, 
+                    proyeccion: str = 'GRS80'):
         '''
         Obtiene un GeoDataFrame con la información de la línea registrada en la Red Nacional de Caminos más cercana a una coordenada. 
         
@@ -108,8 +115,16 @@ class Ruteo:
         
         return self.__obtener_consulta(funcion, params)
     
-    def CalcularRuta(self, linea_inicial = None, linea_final = None, destino_inicial = None, destino_final = None, tipo_vehiculo: int = 0, 
-                     ruta: str = 'optima', ejes_excedentes: int = 0, saltar_lineas = None, proyeccion: str = 'GRS80'):
+    def CalcularRuta(self, 
+                     linea_inicial: 'DataFrame|dict' = None, 
+                     linea_final: 'DataFrame|dict' = None, 
+                     destino_inicial: 'DataFrame|dict|str|int' = None, 
+                     destino_final: 'DataFrame|dict|str|int' = None, 
+                     tipo_vehiculo: int = 0, 
+                     ruta: str = 'optima', 
+                     ejes_excedentes: int = 0, 
+                     saltar_lineas: list = None, 
+                     proyeccion: str = 'GRS80'):
         '''
         Obtiene un GeoDataFrame con la ruta calculada por Sistema de Ruteo de México y la Red Nacional de Caminos. Se puede obtener rutas de línea-línea, destino-destino, línea-destino y destino-linea. 
         
@@ -135,8 +150,16 @@ class Ruteo:
         
         return ruta
     
-    def DetalleRuta(self, linea_inicial = None, linea_final = None, destino_inicial = None, destino_final = None, tipo_vehiculo: int = 0, 
-                     ruta: str = 'optima', ejes_excedentes: int = 0, saltar_lineas = None, proyeccion: str = 'GRS80'):
+    def DetalleRuta(self,
+                    linea_inicial: 'DataFrame|dict' = None, 
+                    linea_final: 'DataFrame|dict' = None, 
+                    destino_inicial: 'DataFrame|dict|str|int' = None, 
+                    destino_final: 'DataFrame|dict|str|int' = None, 
+                    tipo_vehiculo: int = 0, 
+                    ruta: str = 'optima', 
+                    ejes_excedentes: int = 0, 
+                    saltar_lineas: list = None, 
+                    proyeccion: str = 'GRS80'):
         '''
         Obtiene un GeoDataFrame con los detalles de la ruta calculada por Sistema de Ruteo de México y la Red Nacional de Caminos. Se puede obtener rutas de línea-línea, destino-destino, línea-destino y destino-linea. 
         
