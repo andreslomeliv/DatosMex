@@ -29,6 +29,8 @@ La instalación de GeoPandas puede ser un poco complicada de manejar por lo que 
 
 ## Instalación
 
+```pip install INEGIpy```
+
 ## Documentación
 
 * [Indicadores](#Indicadores)

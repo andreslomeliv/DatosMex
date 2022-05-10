@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST.in
+long_desc.md
+requirements.txt
+setup.py
+INEGIpy/__init__.py
+INEGIpy/_denue.py
+INEGIpy/_indicadores.py
+INEGIpy/_marco_geoestadistico.py
+INEGIpy/_ruteo.py
+INEGIpy.egg-info/PKG-INFO
+INEGIpy.egg-info/SOURCES.txt
+INEGIpy.egg-info/dependency_links.txt
+INEGIpy.egg-info/requires.txt
+INEGIpy.egg-info/top_level.txt

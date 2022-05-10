@@ -1,3 +1,15 @@
+Metadata-Version: 2.1
+Name: INEGIpy
+Version: 1.0.2
+Summary: Librería en Python para facilitar el uso de las APIs del INEGI
+Home-page: https://github.com/andreslomeliv/DatosMex/tree/master/INEGIpy
+Author: Andres Lomelí Viramontes
+Author-email: andres.lomeli.v@gmail.com
+License: MIT
+Platform: UNKNOWN
+Requires-Python: >=3.6.0
+License-File: LICENSE
+
 INEGIpy es una librería para interactuar fácilmente con los datos del Instituto Nacional de Geografía y Estadística (INEGI) desde Python. Su propósito es apoyar en la creación de consultas automatizadas y  en el acceso a la información para el análisis de datos. 
 
 De la información que ofrece el INEGI actualmente se cuenta con una clase dedicada al Banco de Indicadores, otra dedicada al DENUE, otra a la información del Marco Geoestadístico y finalmente una dedicada al Sistema de Ruteo de México.
@@ -26,3 +38,4 @@ También se encuentra en constrcción un módulo de Series dedicado a consultas 
 La instalación de GeoPandas puede ser un poco complicada de manejar por lo que se recomieda instalarla previemente: https://geopandas.org/en/stable/getting_started/install.html
 
 Más información en: https://github.com/andreslomeliv/DatosMex/tree/master/INEGIpy
+
