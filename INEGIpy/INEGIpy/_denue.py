@@ -175,18 +175,18 @@ class DENUE:
         Parámetros:
         ------------
         nombre: str. Nombre del establecimiento a buscar.
-        clave_area: str. Clave de dos a dieciseis caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. En caso de no definir una clave se regresan todos los establecmientos del país.
+        clave_area: str. Clave de dos a dieciseis caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. En caso de no definir una clave se regresan todos los establecimientos del país.
                                     Dos caracteres para incluir nivel estatal (ej. 01 a 32).
                                     Cinco caracteres dígitos para incluir nivel municipal (ej. 01001).
                                     Nueve caracteres para incluir nivel localidad (ej. 010010001).
                                     Trece caracteres para incluir nivel Área Geoestadística Básica (AGEB) (ej. 010010001216A).
                                     Dieciseis caracteres para incluir nivel manzana (ej. 010010001465A004).
         clave_actividad: str. Clave de dos a seis dígitos que identifica el área de actividad económica del establecimiento de acuerdo con el Sistema de Clasificación Industrial de América del Norte 2018. En caso de no definir una clave se regresan todas las áreas.
-                                    Dos dígitos para incluir nivel sector (ej.46).
-                                    Tres dígitos para incluir nivel subsector (ej. 464).
-                                    Cuatro dígitos para incluir nivel rama (ej. 4641).
-                                    Cinco dígitos para incluir nivel subrama (ej. 46411).
-                                    Seis dígitos para incluir nivel clase (ej. 464111).
+                                    Dos dígitos para definir un sector (ej.46).
+                                    Tres dígitos para definir un subsector (ej. 464).
+                                    Cuatro dígitos para definir una rama (ej. 4641).
+                                    Cinco dígitos para definir una subrama (ej. 46411).
+                                    Seis dígitos para definir una clase (ej. 464111).
         registro_inicial: int. Número de registro a partir del cuál se mostrarán los resultados de la búsqueda.
         registro_final: int. Número de registro final que se mostrará en los resultados de la búsqueda.
         clave_establecimiento: str. Clave única del establecimiento. Para incluir todos los establecimientos se especifica 0.
@@ -231,16 +231,16 @@ class DENUE:
         
         Parámetros:
         ------------
-        clave_area: str/list. Clave(s) de dos a nueve caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. En caso de no definir una clave se regresan todos los establecmientos del país.
+        clave_area: str/list. Clave(s) de dos a nueve caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. En caso de no definir una clave se regresan todos los establecimientos del país.
                                     Dos dígitos para incluir nivel estatal (ej.01 a 32).
                                     Cinco dígitos dígitos para incluir nivel municipal (ej. 01001).
                                     Nueve dígitos para incluir nivel localidad (ej. 010010001).
         clave_actividad: str/list. Clave(s) de dos a seis dígitos que identifican el área de actividad económica de los establecimientos de acuerdo con el Sistema de Clasificación Industrial de América del Norte 2018. Para incluir todas las actividades se especifica 0.
-                                    Dos dígitos para incluir nivel sector (ej.46).
-                                    Tres dígitos para incluir nivel subsector (ej. 464).
-                                    Cuatro dígitos para incluir nivel rama (ej. 4641).
-                                    Cinco dígitos para incluir nivel subrama (ej. 46411).
-                                    Seis dígitos para incluir nivel clase (ej. 464111).
+                                    Dos dígitos para definir un sector (ej.46).
+                                    Tres dígitos para definir un subsector (ej. 464).
+                                    Cuatro dígitos para definir una rama (ej. 4641).
+                                    Cinco dígitos para definir una subrama (ej. 46411).
+                                    Seis dígitos para definir una clase (ej. 464111).
         estrato: str. Clave de un dígito que identifica el estrato del establecimiento (cantidad de trabajadores). Para incluir todos los tamaños se especifica 0.
                                     1. Para incluir de 0 a 5 personas.
                                     2. Para incluir de 6 a 10 personas.

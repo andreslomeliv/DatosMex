@@ -163,7 +163,7 @@ class MarcoGeoestadistico:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
         municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001)
-        localidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001 )
+        localidades: str/list. Clave(s) de cuatro dígitos de las localidades a buscar (ej. 0001 )
         nombres: str/list. Nombre(s) de las localidades a buscar. Si se define este parámetro obtiene las localidades amanzanadas cuyo nombre contenga el texto proporcionado sin necesidad de proporcionar las claves de las localidades. No distingue entre mayúsculas y minúsculas pero sí considera acentos.
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         ambito: str. ['urbano'|'rural'] Define el ambito de las localidades. Si se define un ámbito no se puede definir una localidad en específico y se debe definir tanto entidad como municipio.
@@ -200,7 +200,7 @@ class MarcoGeoestadistico:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
         municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001)
-        loacalidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001 )
+        loacalidades: str/list. Clave(s) de cuatro dígitos de las localidades a buscar (ej. 0001 )
         nombres: str/list. Nombre(s) de las localidades a buscar. Si se define este parámetro obtiene las localidades amanzanadas cuyo nombre contenga el texto proporcionado sin necesidad de proporcionar las claves de las localidades. No distingue entre mayúsculas y minúsculas pero sí considera acentos.
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         as_geodf: bool. Si el valor es verdadero regresa un GeoDataFrame para facilitar el análisis espacial. 
@@ -234,7 +234,7 @@ class MarcoGeoestadistico:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
         municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001).
-        loacalidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001).
+        loacalidades: str/list. Clave(s) de cuatro dígitos de las localidades a buscar (ej. 0001).
         agebs: str/list. Clave(s) de cuatro dígitos con las AGEBs a buscar (ej. 2000).
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         ambito: str. ['urbano'|'rural'] Define el ambito de las AGEBs. A diferencia de las localidades amanzanadas siempre se debe especificar el ambitos de las AGEBsa buscar. Por default son urbanas.
@@ -273,7 +273,7 @@ class MarcoGeoestadistico:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
         municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001)
-        localidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001)
+        localidades: str/list. Clave(s) de cuatro dígitos de las localidades a buscar (ej. 0001)
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         ambito: str. ['urbano'|'rural'] Define el ambito de las manzanas. Si se define un ámbito no se puede definir una localidad en específico y se debe definir tanto entidad como municipio.
         as_geodf: bool. Si el valor es verdadero regresa un GeoDataFrame para facilitar el análisis espacial. 
@@ -305,7 +305,7 @@ class MarcoGeoestadistico:
         -----------
         entidades: str/list. Clave(s) AGEE de dos dígitos (01 a 32) de las entidades federativas a buscar.
         municipios: str/list. Clave(s) AGEM de tres dígitos de los municipios a buscar (ej. 001)
-        localidades: str/list. Clave(s) de cuatro dígitos de las localidad a buscar (ej. 0001)
+        localidades: str/list. Clave(s) de cuatro dígitos de las localidades a buscar (ej. 0001)
         claves_concatendas: str/list. Clave(s) concatenada con los niveles de agregación espacial.
         as_geodf: bool. Si el valor es verdadero regresa un GeoDataFrame para facilitar el análisis espacial. 
         -----------

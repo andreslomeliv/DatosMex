@@ -26,7 +26,8 @@ class Ruteo:
             df = df.drop('geojson', axis=1)
             df = gpd.GeoDataFrame(df)
             df.crs = 'EPSG:4326'
-            return df
+        if 'punto_caseta' in df.columns:
+            df.punto_caseta = df.punto_caseta.apply(lambda x: shape(json.loads(x)) if x else x)
         return df
         
     def BuscarDestino(self, 
@@ -106,10 +107,10 @@ class Ruteo:
             except: raise Exception("Se deben proporcionar los parámterios id_routing_net, source y target de la línea final")
             
         if destino_inicial is not None: 
-            if isinstance(destino_inicial, DataFrame): params['dest_i'] = destino_inicial['id_dest']
+            if isinstance(destino_inicial, DataFrame): params['dest_i'] = destino_inicial['id_dest'].iloc[0]
             else: params['dest_i'] = destino_inicial
         if destino_final is not None:
-            if isinstance(destino_final, DataFrame): params['dest_f'] = destino_inicial['id_dest']
+            if isinstance(destino_final, DataFrame): params['dest_f'] = destino_final['id_dest'].iloc[0]
             else: params['dest_f'] = destino_final
         if saltar_lineas is not None: params['b'] = ','.join(saltar_lineas)
         
