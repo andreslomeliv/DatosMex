@@ -2,7 +2,6 @@ import pandas as pd
 import requests
 import json
 import geopandas as gpd
-from typing import Optional
 
 class MarcoGeoestadistico:
     def __init__(self):
