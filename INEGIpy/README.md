@@ -19,12 +19,10 @@ También se encuentra en constrcción un módulo de Series dedicado a consultas 
 ## Requerimientos
 
 * pandas
-* matplotlib
-* seaborn
+* numpy
 * requests
 * shapely
 * geopandas
-* fiona
 
 La instalación de GeoPandas puede ser un poco complicada de manejar por lo que se recomieda [instalarla previemente](https://geopandas.org/en/stable/getting_started/install.html).
 
