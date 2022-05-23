@@ -109,7 +109,9 @@ class MarcoGeoestadistico:
         
         '''
         liga, areas_geoestadisticas = self.__liga_y_areas(nombres, entidades, 'mgee', as_geodf)
-        return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
+        df = self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
+        df.iloc[:, -4:] = df.iloc[:, -4:].astype(int)
+        return df
     
     # esta requiere llamar la función concatenadora
     def Municipios(self, 
@@ -141,7 +143,9 @@ class MarcoGeoestadistico:
         '''
         claves = self.__obtener_claves(entidades, municipios, None, None, claves_concatenadas)
         liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'mgem', as_geodf)
-        return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
+        df = self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
+        df.iloc[:, -4:] = df.iloc[:, -4:].astype(int)
+        return df
     
     def LocalidadesAmanzanadas(self, 
                                entidades: 'str|list' = None, 
@@ -179,6 +183,8 @@ class MarcoGeoestadistico:
         liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'localidades/pol', True)
         df = self.__obtener_consulta(liga, areas_geoestadisticas, True, ambito)
         if as_geodf is False: df = pd.DataFrame(df.drop('geometry',axis=1))
+        try: df.iloc[:, -5:-3] = df.iloc[:, -5:-3].astype(int)
+        except: pass
         return df
     
     def LocalidadesRuralesPuntuales(self, 
@@ -212,8 +218,10 @@ class MarcoGeoestadistico:
         '''
         claves = self.__obtener_claves(entidades, municipios, localidades, None, claves_concatenadas, False)
         liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'localidades/ruralespto', True)
-        df = self.__obtener_consulta(liga, areas_geoestadisticas, True, ambito)
+        df = self.__obtener_consulta(liga, areas_geoestadisticas, True)
         if as_geodf is False: df = pd.DataFrame(df.drop('geometry',axis=1))
+        try: df.iloc[:, -5:-3] = df.iloc[:, -5:-3].astype(int)
+        except: pass
         return df
     
     def AGEBs(self, 
@@ -250,8 +258,10 @@ class MarcoGeoestadistico:
         else: claves = self.__obtener_claves(entidades, municipios, localidades, agebs, claves_concatenadas)
         if claves_concatenadas: claves = [self.__obtener_claves(claves_concatenadas=clave)[0] if len(clave) <= 5 else clave for clave in claves]
         liga, areas_geoestadisticas = self.__liga_y_areas(None, claves, tipo_area, as_geodf)
-        return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
-        
+        df = self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
+        try: df.iloc[:, -5:-1] = df.iloc[:, -5:-1].astype(int)
+        except: pass
+        return df
         
     
     def Manzanas(self, 
@@ -285,7 +295,10 @@ class MarcoGeoestadistico:
         '''
         claves = self.__obtener_claves(entidades, municipios, localidades, None, claves_concatenadas)
         liga, areas_geoestadisticas = self.__liga_y_areas(None, claves, 'mza', as_geodf)
-        return self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf, ambito)
+        df = self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf, ambito)
+        try: df.loc[:, ["pobtot", "pobmas", "pobfem", "tvivhab"]] = df.loc[:, ["pobtot", "pobmas", "pobfem", "tvivhab"]].astype(float)
+        except: pass
+        return df
     
     def Vialidades(self, 
                    entidades: 'str|list' = None, 

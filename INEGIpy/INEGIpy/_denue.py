@@ -32,6 +32,7 @@ class DENUE:
         data = json.loads(req.text)
         df = pd.DataFrame(data)
         if as_geodf: df = self.__obtener_geodataframe(df)
+        if len(df.columns) == 3: df.loc[:,'Total'] = df.loc[:, "Total"].astype(int)
         return df
         
     def Buscar(self, 

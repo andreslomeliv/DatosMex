@@ -1,6 +1,8 @@
 import pandas as pd
 import requests
 import json
+import warnings
+from numpy import nan
 
 class Indicadores:
     
@@ -20,6 +22,7 @@ class Indicadores:
         self.__frecuancias_dict = {'BIE': {'1':(1,'Y'), '2':(1,'Y'), '3':(1,'Y'), '4':(6,'M'), '5':(4,'M'), '6':(3,'Q'), 
                                             '7':(2,'M'), '8':(1,'M'), '9':(14,'SM')},
                                     'BISE': {'1':(1,'Y'), '3':(1,'Y'), '4':(3,'Q'), '7':(14,'SM'), '8':(1,'M'), '9':(1,'Y'), '16':(1,'Y')}}
+        self.__clave_entidad = None
         
 ############## Obtener Data Frame ########################
 
@@ -58,16 +61,16 @@ class Indicadores:
     
         """
         if banco: 
-            liga_api = '{}{}/es/0700/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, banco, str(self.__token))
+            liga_api = '{}{}/es/{}/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, self.__clave_entidad, banco, str(self.__token))
             data = self.__request(liga_api)
         else:
             try: 
                 banco = 'BIE'
-                liga_api = '{}{}/es/0700/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, banco, str(self.__token))
+                liga_api = '{}{}/es/{}/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, self.__clave_entidad, banco, str(self.__token))
                 data = self.__request(liga_api)
             except: 
                 banco = 'BISE'
-                liga_api = '{}{}/es/0700/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador, banco, str(self.__token))
+                liga_api = '{}{}/es/{}/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador,  self.__clave_entidad, banco, str(self.__token))
                 data = self.__request(liga_api)
 
         return data, banco
@@ -93,20 +96,31 @@ class Indicadores:
         """
         obs_totales = len(data['Series'][0]['OBSERVATIONS'])
         dic = {'fechas':[data['Series'][0]['OBSERVATIONS'][i]['TIME_PERIOD'] for i in range(obs_totales)],
-                'valor':[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) for i in range(obs_totales)]}
+                'valor':[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) if data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE'] is not None else nan for i in range(obs_totales)]}
         df = pd.DataFrame.from_dict(dic)
         frecuencia = data['Series'][0]['FREQ']
         factor, period = self.__frecuancias_dict[banco].get(frecuencia) # factor que multiplica el periodo para pasar a fecha y periodo de pd
         if factor: 
-            cambio_fechas = lambda x: '/'.join(x.split('/')[:-1] + [str(int(x.split('/')[-1])*factor)])
-            df.fechas = df.fechas.apply(cambio_fechas)
-            df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
-            df = df.drop(['fechas'],axis=1)
-            if period == 'SM': df.index = df.index + pd.offsets.SemiMonthBegin()
+            try: 
+                cambio_fechas = lambda x: '/'.join(x.split('/')[:-1] + [str(int(x.split('/')[-1])*factor)])
+                df.fechas = df.fechas.apply(cambio_fechas)
+                df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
+                df = df.drop(['fechas'],axis=1)
+                if period == 'SM': df.index = df.index + pd.offsets.SemiMonthBegin()
+            except: 
+                df.set_index(df.fechas,inplace=True, drop=True)
+                df = df.drop(['fechas'],axis=1)
         else:
             df.set_index(df.fechas,inplace=True, drop=True)
             df = df.drop(['fechas'],axis=1)
         return df
+
+    def __definir_cve_ent(self, entidad):
+        cve_base = '0700'
+        if entidad == '00': 
+            self.__clave_entidad = cve_base
+        if len(entidad[2:5]) == 0: self.__clave_entidad = '{}00{}'.format(cve_base, entidad[:2])
+        else: self.__clave_entidad = '{}00{}0{}'.format(cve_base, entidad[:2], entidad[2:5])
 
     # en este módulo solo se definen inicio y fin como variables ya que son las únicas que necesariamente están en
     # cada módulo. El resto de las variables se van definiendo en los módulos que hereden esta clase. 
@@ -128,7 +142,8 @@ class Indicadores:
             lista_df.append(df)
 
         df = pd.concat(lista_df,axis=1)
-        df.columns = self._columnas
+        try: df.columns = self._columnas
+        except: warnings.warn('Los nombres no coinciden con el número de indicadores')
 
         return df[inicio:fin] 
         
@@ -136,15 +151,18 @@ class Indicadores:
     def obtener_df(self, 
                    indicadores: 'str|list', 
                    nombres: 'str|list' = None, 
+                   clave_area: str = '00',
                    inicio: str = None, 
                    fin: str = None):
         """
         Regresa un DataFrame con la información de los indicadores proporcionada por el API del INEGI.
-
         Parametros
         -----------
         indicadores: str/list. Lista con los indicadores de las series a obtener.
         nombres: list/str, opcional. Lista con los nombres de las columas del DataFrame. De no proporcionarse, se usarán los indicadores.
+        clave_area: str. Clave de dos a cinco caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. Para definir el total nacional se especifica '00'. Este campo solo aplica para los indicadores del Bando de Indicadores (BISE), no aplica para los del Banco de Información Económica (BIE).
+                                    Dos dígitos para incluir nivel estatal (ej.01 a 32).
+                                    Cinco dígitos dígitos para incluir nivel municipal (ej. 01001).s
         inicio: str, opcional. Fecha donde iniciar la serie. De no proporcionarse será desde el primer valor disponible. 
         fin: str, opcional. Fecha donde terminar la serie. De no proporcionarse será hasta el último valor disponible. 
         ----------
@@ -152,12 +170,31 @@ class Indicadores:
         El DataFrame resultante tiene una columna por cada indicador y un DateTimeIndex con la fecha de los valores. 
         
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
-
         """     
         self._indicadores = indicadores
         if nombres: 
             self._columnas = nombres
+        self.__definir_cve_ent(clave_area)
         return self._consulta(inicio, fin)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ##################### Graficar #######################
 
@@ -220,5 +257,3 @@ class Indicadores:
   #      if show: plt.show()
  #       if filename: plt.savefig(filename)
  #       return fig, ax
-
-
