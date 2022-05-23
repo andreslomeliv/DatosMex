@@ -83,6 +83,7 @@ La clase ```Indicadores``` contiene los métodos y atributos relacionados a la A
 ```python
 Indicadores.obtener_df(indicadores, 
                        nombres = None, 
+                       clave_area = '00',
                        inicio = None, 
                        fin = None)
 ```
