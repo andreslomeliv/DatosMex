@@ -128,7 +128,6 @@ class Indicadores:
         
         if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
         if isinstance(self._bancos, str): self._bancos = [self._bancos]
-        if len(self._columnas) == 0: self._columnas = self._indicadores
         if isinstance(self._columnas, str): self._columnas = [self._columnas]
         
         lista_df = []
@@ -172,6 +171,7 @@ class Indicadores:
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
         """     
         self._indicadores = indicadores
+        self._columnas = indicadores
         if nombres: 
             self._columnas = nombres
         self.__definir_cve_ent(clave_area)

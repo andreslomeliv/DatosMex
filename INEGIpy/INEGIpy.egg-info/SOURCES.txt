@@ -1,7 +1,6 @@
 LICENSE
 MANIFEST.in
 long_desc.md
-requirements.txt
 setup.py
 INEGIpy/__init__.py
 INEGIpy/_denue.py
