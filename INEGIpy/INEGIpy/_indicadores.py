@@ -94,6 +94,7 @@ class Indicadores:
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
     
         """
+        print(data)
         obs_totales = len(data['Series'][0]['OBSERVATIONS'])
         dic = {'fechas':[data['Series'][0]['OBSERVATIONS'][i]['TIME_PERIOD'] for i in range(obs_totales)],
                 'valor':[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) if data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE'] is not None else nan for i in range(obs_totales)]}
@@ -119,6 +120,7 @@ class Indicadores:
         cve_base = '0700'
         if entidad == '00': 
             self.__clave_entidad = cve_base
+            return
         if len(entidad[2:5]) == 0: self.__clave_entidad = '{}00{}'.format(cve_base, entidad[:2])
         else: self.__clave_entidad = '{}00{}0{}'.format(cve_base, entidad[:2], entidad[2:5])
 
