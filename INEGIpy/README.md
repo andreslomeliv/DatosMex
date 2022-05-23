@@ -89,6 +89,9 @@ Indicadores.obtener_df(indicadores,
 **Parámetros**
 * **indicadores:** str/list. Clave(s) de los indicadores de la consulta. 
 * **nombres:** str/list. Nombre(s) de las columas del DataFrame. De no proporcionarse se usarán los indicadores. 
+* **clave_area:** str. Clave de dos a cinco caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. Para definir el total nacional se especifica '00'. Este campo solo aplica para los indicadores del Bando de Indicadores (BISE), no aplica para los del Banco de Información Económica (BIE).
+                                    Dos dígitos para incluir nivel estatal (ej.01 a 32).
+                                    Cinco dígitos dígitos para incluir nivel municipal (ej. 01001).
 * **inicio:** str. Fecha donde iniciar la serie en formato YYYY(-MM-DD). De no proporcionarse será desde el primer valor disponible. 
 * **fin:** str. Fecha donde terminar la serie en formato YYYY(-MM-DD). De no proporcionarse será hasta el último valor disponible.
 
@@ -205,6 +208,53 @@ display(df.tail())
 </table>
 </div>
 
+```python
+df = inegi.obtener_df(indicadores = "6200093954", 
+                      nombres = 'poblacion_ocupada_aguascalientes',
+                      clave_area = '01',
+                      inicio = '2000', 
+                      fin = '2010')
+
+display(df.head())
+```
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>poblacion_ocupada_aguascalientes</th>
+    </tr>
+    <tr>
+      <th>fechas</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2005-03-01</th>
+      <td>391833.0</td>
+    </tr>
+    <tr>
+      <th>2005-06-01</th>
+      <td>399617.0</td>
+    </tr>
+    <tr>
+      <th>2005-09-01</th>
+      <td>401020.0</td>
+    </tr>
+    <tr>
+      <th>2005-12-01</th>
+      <td>413326.0</td>
+    </tr>
+    <tr>
+      <th>2006-03-01</th>
+      <td>408344.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 
 ### MarcoGeoestadistico
 
