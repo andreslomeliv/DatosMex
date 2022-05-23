@@ -110,7 +110,8 @@ class MarcoGeoestadistico:
         '''
         liga, areas_geoestadisticas = self.__liga_y_areas(nombres, entidades, 'mgee', as_geodf)
         df = self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
-        df.iloc[:, -4:] = df.iloc[:, -4:].astype(int)
+        try: df.iloc[:, -4:] = df.iloc[:, -4:].astype(int)
+        except: pass
         return df
     
     # esta requiere llamar la función concatenadora
@@ -144,7 +145,8 @@ class MarcoGeoestadistico:
         claves = self.__obtener_claves(entidades, municipios, None, None, claves_concatenadas)
         liga, areas_geoestadisticas = self.__liga_y_areas(nombres, claves, 'mgem', as_geodf)
         df = self.__obtener_consulta(liga, areas_geoestadisticas, as_geodf)
-        df.iloc[:, -4:] = df.iloc[:, -4:].astype(int)
+        try: df.iloc[:, -4:] = df.iloc[:, -4:].astype(int)
+        except: pass
         return df
     
     def LocalidadesAmanzanadas(self, 
