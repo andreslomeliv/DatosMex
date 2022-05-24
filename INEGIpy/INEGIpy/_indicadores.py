@@ -21,7 +21,7 @@ class Indicadores:
         # las claves que no se encuentran en el diccionario son irregulares y no se van a operar
         self.__frecuancias_dict = {'BIE': {'1':(1,'Y'), '2':(1,'Y'), '3':(1,'Y'), '4':(6,'M'), '5':(4,'M'), '6':(3,'Q'), 
                                             '7':(2,'M'), '8':(1,'M'), '9':(14,'SM')},
-                                    'BISE': {'1':(1,'Y'), '3':(1,'Y'), '4':(3,'Q'), '7':(14,'SM'), '8':(1,'M'), '9':(1,'Y'), '16':(1,'Y')}}
+                                    'BISE': {'1':(1,'Y'), '3':(1,'Y'), '4':(3,'Q'), '7':(1,'Y'), '8':(1,'M'), '9':(1,'Y'), '16':(1,'Y')}}
         self.__clave_entidad = None
         
 ############## Obtener Data Frame ########################
@@ -94,7 +94,6 @@ class Indicadores:
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
     
         """
-        print(data)
         obs_totales = len(data['Series'][0]['OBSERVATIONS'])
         dic = {'fechas':[data['Series'][0]['OBSERVATIONS'][i]['TIME_PERIOD'] for i in range(obs_totales)],
                 'valor':[float(data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE']) if data['Series'][0]['OBSERVATIONS'][i]['OBS_VALUE'] is not None else nan for i in range(obs_totales)]}
@@ -109,11 +108,14 @@ class Indicadores:
                 df = df.drop(['fechas'],axis=1)
                 if period == 'SM': df.index = df.index + pd.offsets.SemiMonthBegin()
             except: 
+                df.fechas = dic['fechas']
                 df.set_index(df.fechas,inplace=True, drop=True)
                 df = df.drop(['fechas'],axis=1)
+                warnings.warn('No se pudo interpretar la fecha correctamente por lo que el índice no es tipo DateTime')
         else:
             df.set_index(df.fechas,inplace=True, drop=True)
             df = df.drop(['fechas'],axis=1)
+            warnings.warn('No se pudo interpretar la fecha correctamente por lo que el índice no es tipo DateTime')
         return df
 
     def __definir_cve_ent(self, entidad):
