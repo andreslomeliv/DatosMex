@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 from setuptools import setup
 import pathlib
 
@@ -12,7 +12,7 @@ URL = 'https://github.com/andreslomeliv/DatosMex/tree/master/INEGIpy'
 EMAIL = 'andres.lomeli.v@gmail.com'
 AUTHOR = 'Andres Lomelí Viramontes'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '1.0.7'
+VERSION = '1.2.1'
 
 # librerías requeridas
 REQUIRED = [

@@ -82,20 +82,46 @@ La clase ```Indicadores``` contiene los métodos y atributos relacionados a la A
 ```python
 Indicadores.obtener_df(indicadores, 
                        nombres = None, 
-                       clave_area = '00',
                        inicio = None, 
-                       fin = None)
+                       fin = None,
+                       banco = None,
+                       metadatos = False)
 ```
 **Parámetros**
-* **indicadores:** str/list. Clave(s) de los indicadores de la consulta. 
+* **indicadores:** str/list. Clave(s) de los indicadores a consultar. 
 * **nombres:** str/list. Nombre(s) de las columas del DataFrame. De no proporcionarse se usarán los indicadores. 
 * **clave_area:** str. Clave de dos a cinco caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. Para definir el total nacional se especifica '00'. Este campo solo aplica para los indicadores del Bando de Indicadores (BISE), no aplica para los del Banco de Información Económica (BIE).
                                     Dos dígitos para incluir nivel estatal (ej.01 a 32).
                                     Cinco dígitos dígitos para incluir nivel municipal (ej. 01001).
 * **inicio:** str. Fecha donde iniciar la serie en formato YYYY(-MM-DD). De no proporcionarse será desde el primer valor disponible. 
 * **fin:** str. Fecha donde terminar la serie en formato YYYY(-MM-DD). De no proporcionarse será hasta el último valor disponible.
+* **banco:** str, opcional. ['BIE' | 'BISE'] Define el banco al cual pertenecen los indicadores. Puede ser el Banco de Indicadores Económicos (BISE) o el Banco de Información Económica (BIE). Ya que solamente tres claves de indicadores se encuentran en ambos bancos y el resto son diferentes, no es necesario definir este parámetro a menos que los indicadores a consultar sea alguno de los siguientes: ['539260', '539261', '539262'].
+* **metadatos:** bool. En caso se ser verdadero regresa un DataFrame con los metadatos de los indicadores.
 
 Regresa un DataFrame con la información de los indicadores. El DataFrame resultante tiene una columna por cada indicador y un DateTimeIndex con la fecha de los valores. 
+Si ```metadatos = True``` regresa un segundo DataFrame con las claves de los metadatos del indicador. 
+
+##### consulta_metadatos()
+
+```python
+Indicadores.consulta_metadatos(metadatos)
+```
+**Parámetros**
+* **metadatos:** DataFrame con los metadatos a consultar obtenido por la función obtener_df cuando ```metadatos = True```. También acepta un diccionario equivalente.
+
+Regresa un DataFrame con la descripción de los metadatos de una o más series. 
+
+##### catalogo_indicadores()
+
+```python
+Indicadores.catalogo_indicadores(banco,
+                                 indicador = None)
+```
+**Parámetros**
+* **banco:** str. ['BIE' | 'BISE'] Define el banco al cual pertenecen los indicadores. Puede ser el Banco de Indicadores Económicos (BISE) o el Banco de Información Económica (BIE).
+* **indicador:** str. Clave del indicador a consultar. En caso de no definirse se regresan todos los indicadores del banco.
+
+Regresa un DataFrame con la descripción de uno o todos los indicadores de un banco. 
 
 #### Uso
 
@@ -209,13 +235,15 @@ display(df.tail())
 </div>
 
 ```python
-df = inegi.obtener_df(indicadores = "6200093954", 
-                      nombres = 'poblacion_ocupada_aguascalientes',
-                      clave_area = '01',
-                      inicio = '2000', 
-                      fin = '2010')
+df, metadatos = inegi.obtener_df(indicadores = "6200093954", 
+                                 nombres = 'poblacion_ocupada_aguascalientes',
+                                 clave_area = '01',
+                                 inicio = '2000', 
+                                 fin = '2010',
+                                 metadatos = True)
 
 display(df.head())
+display(metadatos)
 ```
 
 
@@ -251,6 +279,171 @@ display(df.head())
     <tr>
       <th>2006-03-01</th>
       <td>408344.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>poblacion_ocupada_aguascalientes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>INDICADOR</th>
+      <td>6200093954</td>
+    </tr>
+    <tr>
+      <th>FREQ</th>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>TOPIC</th>
+      <td>18</td>
+    </tr>
+    <tr>
+      <th>UNIT</th>
+      <td>188</td>
+    </tr>
+    <tr>
+      <th>UNIT_MULT</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>NOTE</th>
+      <td>10733,10956</td>
+    </tr>
+    <tr>
+      <th>SOURCE</th>
+      <td>8</td>
+    </tr>
+    <tr>
+      <th>LASTUPDATE</th>
+      <td>23/05/2022</td>
+    </tr>
+    <tr>
+      <th>STATUS</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>BANCO</th>
+      <td>BISE</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+desc_metadatos = inegi.consulta_metadatos(metadatos)
+
+display(desc_metadatos)
+```
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>poblacion_ocupada_aguascalientes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>INDICADOR</th>
+      <td>Población ocupada - 15 años y más</td>
+    </tr>
+    <tr>
+      <th>FREQ</th>
+      <td>Trimestral</td>
+    </tr>
+    <tr>
+      <th>TOPIC</th>
+      <td>Empleo y ocupación</td>
+    </tr>
+    <tr>
+      <th>UNIT</th>
+      <td>Personas</td>
+    </tr>
+    <tr>
+      <th>UNIT_MULT</th>
+      <td></td>
+    </tr>
+    <tr>
+      <th>NOTE</th>
+      <td>Personas de 15 años y más de edad que en la se...</td>
+    </tr>
+    <tr>
+      <th>SOURCE</th>
+      <td>Encuesta Nacional de Ocupación y Empleo (ENOE)...</td>
+    </tr>
+    <tr>
+      <th>LASTUPDATE</th>
+      <td>23/05/2022</td>
+    </tr>
+    <tr>
+      <th>STATUS</th>
+      <td>Definitiva</td>
+    </tr>
+    <tr>
+      <th>BANCO</th>
+      <td>BISE</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+```python
+indicadores = inegi.catalogo_indicadores('BIE')
+
+display(indicadores.head())
+```
+
+
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>value</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>Serie original</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+      <td>Serie desestacionalizada</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>5</td>
+      <td>Tendencia-ciclo</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>11</td>
+      <td>Aguascalientes</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>12</td>
+      <td>Baja California</td>
     </tr>
   </tbody>
 </table>
