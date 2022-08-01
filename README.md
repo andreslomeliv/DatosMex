@@ -26,16 +26,7 @@ from INEGIpy import Indicadores
 token = 'foobar'
 indicador = Indicadores(token) 
 
-# Indicando los parámetros dentro de las funciones:
 indicador.obtener_df(indicadores = '628229', bancos = 'BIE', nombres = 'Inflación General', inicio = '2018-06', fin = '2021-12')
-
-# Indicando los parámetros fuera de las funciones:
-indicador.indicadores = '628229'
-indicador.bancos = 'BIE'
-indicador.nombres = 'Inflación General'
-indicador.inicio = '2018-06'
-indicador.fin = '2021-12'
-indicador.obtener_df()
 ```
 Las consultas ya generadas se mantienen guardadas en el mismo objeto para uso subsecuente a menos que se cambie algún parámetro. Esto funciona en ambas formas: ya sea estableciendo los parámetros dentro o fuera de las funciones.
 
@@ -62,16 +53,7 @@ from BANXICOpy import Banxico
 token = 'foobar'
 indicador = Banxico(token)
 
-# Indicando los parámetros dentro de las funciones:
 indicador.obtener_df(indicadores = ['SF46405','SF46410'], nombres = ['USD','EURO'], inicio = '2020-01-01', fin = '2021-09-14')
-
-# Indicando los parámetros fuera de las funciones:
-indicador.indicadores = 'SF44043'
-indicador.nombres = 'Base Monetaria Observada'
-indicador.inicio = '2010-01-01'
-indicador.fin = '2022-01-01'
-indicador.obtener_df()
-indicador.grafica()
 ```
 Las consultas ya generadas se mantienen guardadas en el mismo objeto para uso subsecuente a menos que se cambie algún parámetro. Esto funciona en ambas formas: ya sea estableciendo los parámetros dentro o fuera de las funciones.
 

@@ -579,7 +579,7 @@ Se debe definir al menos las entidades, de lo contrario no tendrá resultados.
         
 ##### Manzanas()
 
-<span style="color:red"> *Advertencia: El GeoJSON que regresa esta función del Servicio Web del Catálogo Único de Claves Geoestadísticas contiene varias celdas vacías. Ya he enviado correos al INEGI respecto a este problema pero aún no recibo respuesta así que por lo pronto esta función aún regresa un GeoDataFrame con las celdas vacías.*</span>
+<span style="color:red"> *Advertencia: El GeoJSON que regresa esta función del Servicio Web del Catálogo Único de Claves Geoestadísticas puede conetener celdas con valores nulos en los datos de población. Esto se debe a que las manzanas con una población menor a 10 habitantes no se reportan por confidencialidad.*</span>
 
 ```python
 MarcoGeoestadistico.Manzanas(entidades = None,
