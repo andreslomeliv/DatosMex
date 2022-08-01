@@ -60,61 +60,74 @@ class IndicadorGeneral:
 
         return self._df[self.inicio:self.fin] 
 
-##################### Graficar ######################
 
-    def __cambiar_lineas(self, ax, estilo):
-        if estilo == 'colores':
-            self.__cambiar_colores(ax)
-        if estilo == 'blanco y negro':
-            self.__cambiar_estilos(ax)
-        ax.legend(self._columnas)
 
-    def __cambiar_estilos(self, ax):
-        # checar cuál es la mejor manera de elejir los estilos
-        line_styles = ['-','-.','--',':']
-        markers = ['o','v','s','x','D']
-        for i, line in enumerate(ax.get_lines()):
-            if i <= 3: line.set_linestyle(line_styles[i])
-            else: line.set_marker(markers[i-4])
 
-    def __cambiar_colores(self, ax):
-        palette = sns.color_palette('colorblind',len(self._columnas))[::-1]
-        for i, line in enumerate(ax.get_lines()):
-            line.set_color(palette[i])
 
-    def grafica(self, estilo = 'colores', show = True, filename = None, **kwargs):
-        """
-        Construye un gráfico con la consulta definida. En caso de querer cambiar la consulta se pueden indicar los parámetros
-        deseados: inicio, fin, indicador, serie, o cualquiera de los parámetros particulares de la serie.
 
-        NOTA:
-        Esta función no pretende remplazar el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar
-        estilos de gráficas que puedan ser de uso común. Por ello, la gráfica generada tiene solo ciertos estilos disponibles. 
-        Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas
-        directamente con los datos o para manipular los objetos fig y ax que regresa esta función. 
 
-        Parámetros
-        -----------
-        estilo -- str. ACEPTA: ['colores' (default) | 'blanco y negro']. Estilo de la gráfica. Actualmente solo existen 
-        dos estilos: 'colores' y 'blanco y negro'.
-        show -- bool. Define si mostrar o no la gráfica. Equivalente a plt.show()
-        filename -- nombre y dirección donde guardar la gráfica. Equivalente a plt.savefig()
-        -----------
 
-        Regresa los objetos fig y ax de matplotlib con la gráfica generada. 
 
-        """
-        df = self.obtener_df(**kwargs)
-        color = 'blue' if estilo == 'colores' else 'black'
-        fig, ax = plt.subplots()
-        df.plot(ax=ax,color=color)
-        ax.legend().remove()
-        if len(df.columns)>1: self.__cambiar_lineas(ax, estilo)
-        sns.despine()
-        ax.set_xlabel('')
-        ax.ticklabel_format(style='plain',axis='y')
-        plt.tight_layout()
+
+
+
+
+
+# ##################### Graficar ######################
+
+#     def __cambiar_lineas(self, ax, estilo):
+#         if estilo == 'colores':
+#             self.__cambiar_colores(ax)
+#         if estilo == 'blanco y negro':
+#             self.__cambiar_estilos(ax)
+#         ax.legend(self._columnas)
+
+#     def __cambiar_estilos(self, ax):
+#         # checar cuál es la mejor manera de elejir los estilos
+#         line_styles = ['-','-.','--',':']
+#         markers = ['o','v','s','x','D']
+#         for i, line in enumerate(ax.get_lines()):
+#             if i <= 3: line.set_linestyle(line_styles[i])
+#             else: line.set_marker(markers[i-4])
+
+#     def __cambiar_colores(self, ax):
+#         palette = sns.color_palette('colorblind',len(self._columnas))[::-1]
+#         for i, line in enumerate(ax.get_lines()):
+#             line.set_color(palette[i])
+
+#     def grafica(self, estilo = 'colores', show = True, filename = None, **kwargs):
+#         """
+#         Construye un gráfico con la consulta definida. En caso de querer cambiar la consulta se pueden indicar los parámetros
+#         deseados: inicio, fin, indicador, serie, o cualquiera de los parámetros particulares de la serie.
+
+#         NOTA:
+#         Esta función no pretende remplazar el uso de librerías especializadas como Matplotlib o Seaborn, sino automatizar
+#         estilos de gráficas que puedan ser de uso común. Por ello, la gráfica generada tiene solo ciertos estilos disponibles. 
+#         Para darle un estilo particular o agregar nuevos elementos es recomendado usar alguna de las librerías especializadas
+#         directamente con los datos o para manipular los objetos fig y ax que regresa esta función. 
+
+#         Parámetros
+#         -----------
+#         estilo -- str. ACEPTA: ['colores' (default) | 'blanco y negro']. Estilo de la gráfica. Actualmente solo existen 
+#         dos estilos: 'colores' y 'blanco y negro'.
+#         show -- bool. Define si mostrar o no la gráfica. Equivalente a plt.show()
+#         filename -- nombre y dirección donde guardar la gráfica. Equivalente a plt.savefig()
+#         -----------
+
+#         Regresa los objetos fig y ax de matplotlib con la gráfica generada. 
+
+#         """
+#         df = self.obtener_df(**kwargs)
+#         color = 'blue' if estilo == 'colores' else 'black'
+#         fig, ax = plt.subplots()
+#         df.plot(ax=ax,color=color)
+#         ax.legend().remove()
+#         if len(df.columns)>1: self.__cambiar_lineas(ax, estilo)
+#         sns.despine()
+#         ax.set_xlabel('')
+#         ax.ticklabel_format(style='plain',axis='y')
+#         plt.tight_layout()
         
-        if show: plt.show()
-        if filename: plt.savefig(filename)
-        return fig, ax
+#         if show: plt.show()
+#         if filename: plt.savefig(filename)
+#         return fig, ax
