@@ -34,7 +34,7 @@ La instalación de GeoPandas puede ser un poco complicada de manejar por lo que 
 ## Documentación
 
 * [Indicadores](#Indicadores)
-    * [obtener_df](#obtener_df())
+    * [obtener_df](#obtener_df)
     * [consulta_metadatos](#consulta_metadatos())
     * [catalogo_indicadores](#catalogo_indicadores())
     * [Uso](#Uso)  
