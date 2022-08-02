@@ -7,7 +7,7 @@ URL = 'https://github.com/andreslomeliv/DatosMex/tree/master/BANXICOpy'
 EMAIL = 'andres.lomeli.v@gmail.com'
 AUTHOR = 'Andres Lomelí Viramontes'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.1.0'
+VERSION = '1.0.0'
 
 # librerías requeridas
 REQUIRED = [

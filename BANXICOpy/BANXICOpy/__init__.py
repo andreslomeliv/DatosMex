@@ -1,1 +1,3 @@
-from .banxico_general import Banxico_General
+from .banxico_general import Banxico
+
+__version__ = '1.0.0'
