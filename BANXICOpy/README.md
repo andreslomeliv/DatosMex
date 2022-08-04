@@ -47,6 +47,7 @@ Banxico.obtener_df(indicadores,
 * **fin:** str. Fecha donde terminar la serie en formato YYYY(-MM-DD). De no proporcionarse será hasta el último valor disponible.
 * **decimales:** bool. En caso de ser verdadero regresa la serie con todos los decimales. Si es falso elimina los ceros decimales al final del punto decimal (los menos significativos).
 * **incremento:** str, opcional. En caso de definir alguna de las opciones regresa la serie como el incremento porcentual de alguna observación previa. Las opciones disponibles son las siguientes:
+
                         PorcObsAnt: Porcentaje de incremento con respecto a la observación anterior.
                         PorcAnual: Porcentaje de incremento con respecto a la misma observación del año anterior.
                         PorcAcumAnual: Porcentaje de incremento con respecto a la última observación del año anterior.
@@ -78,6 +79,7 @@ Banxico.dato_oportuno(indicadores,
 * **nombres:** str/list. Nombre(s) de las columas del DataFrame. De no proporcionarse se usarán los indicadores. 
 * **decimales:** bool. En caso de ser verdadero regresa la serie con todos los decimales. Si es falso elimina los ceros decimales al final del punto decimal (los menos significativos).
 * **incremento:** str, opcional. En caso de definir alguna de las opciones regresa la serie como el incremento porcentual de alguna observación previa. Las opciones disponibles son las siguientes:
+
                         PorcObsAnt: Porcentaje de incremento con respecto a la observación anterior.
                         PorcAnual: Porcentaje de incremento con respecto a la misma observación del año anterior.
                         PorcAcumAnual: Porcentaje de incremento con respecto a la última observación del año anterior.
