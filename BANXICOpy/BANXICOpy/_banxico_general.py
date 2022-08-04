@@ -1,9 +1,6 @@
 import requests
 import json
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
-import seaborn as sns
 
 class Banxico:
     def __init__(self, token):
@@ -12,11 +9,11 @@ class Banxico:
         self._indicadores = list()
         self._columnas = list()
         
-    def __generar_consulta(self, consulta):
+    def __generar_consulta(self, consulta, params):
         if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
         indicadores = ','.join(self._indicadores)
         url = '{}/{}/{}'.format(self.__liga_base, indicadores, consulta)
-        req = requests.get(url ,params={'token':self.__token})
+        req = requests.get(url ,params=params)
         data = json.loads(req.text)
         return data['bmx']['series']
     
@@ -35,12 +32,24 @@ class Banxico:
             df = pd.concat(dfs, axis=1)  
             df.columns = self._columnas
         return df
+    
+    def __parametros(self, decimales, incremento):
+        params = {'token': self.__token}
+        if decimales is False: params['decimales'] = 'sinCeros'
+        if incremento is not None: 
+            opciones = ['PorcObsAnt','PorcAnual','PorcAcumAnual']
+            if incremento not in opciones:
+                raise Exception('El incremento debe ser alguna da las siguientes opciones: {}'.format(opciones))
+            params['incremento'] = incremento
+        return params
 
     def obtener_series(self, 
                        indicadores: 'str|list', 
                        nombres: 'str|list' = None, 
                        inicio: str = None, 
-                       fin: str = None):
+                       fin: str = None, 
+                       decimales: bool = True,
+                       incremento: str = None):
         """
         Regresa un DataFrame con los datos de los indicadores proporcionados por la API de Banxico. 
         
@@ -52,6 +61,11 @@ class Banxico:
         nombres: list/str, opcional. Nombre(s) de las columas del DataFrame. De no proporcionarse, se usarán los indicadores.
         inicio: str, opcional. Fecha donde iniciar la serie en formato YYYY(-MM-DD). De no proporcionarse será desde el primer valor disponible. 
         fin: str, opcional. Fecha donde terminar la serie en formato YYYY(-MM-DD). De no proporcionarse será hasta el último valor disponible.
+        decimales: bool. En caso de ser verdadero regresa la serie con todos los decimales. Si es falso elimina los ceros decimales al final del punto decimal (los menos significativos).
+        incremento: str, opcional. En caso de definir alguna de las opciones regresa la serie como el incremento porcentual de alguna observación previa. Las opciones disponibles son las siguientes:
+                            * PorcObsAnt: Porcentaje de incremento con respecto a la observación anterior.
+                            * PorcAnual: Porcentaje de incremento con respecto a la misma observación del año anterior.
+                            * PorcAcumAnual: Porcentaje de incremento con respecto a la última observación del año anterior.
         ----------
 
         El DataFrame resultante tiene una columna por cada indicador y un DateTimeIndex con la fecha de los valores. 
@@ -65,12 +79,13 @@ class Banxico:
         
         if isinstance(self._columnas, str): self._columnas = [self._columnas]
         
-        data = self.__generar_consulta('datos')
+        params = self.__parametros(decimales, incremento)
+        data = self.__generar_consulta('datos', params)
         df = self.__json_a_df(data)
         return df[inicio:fin]
     
-    def obtener_metadatos(self, 
-                          indicadores: 'str|list'):
+    def metadatos(self, 
+                  indicadores: 'str|list'):
         """
         Regresa un DataFrame con los metadatos de los indicadores proporcionados por la API de Banxico.
 
@@ -85,12 +100,15 @@ class Banxico:
 
         """
         self._indicadores = indicadores
-        data = self.__generar_consulta('')
+        params = self.__parametros(True, None)
+        data = self.__generar_consulta('', params)
         return self.__json_a_df(data, metadatos = True)
         
     def dato_oportuno(self, 
                       indicadores: 'str|list', 
-                      nombres: 'str|list' = None):
+                      nombres: 'str|list' = None,
+                      decimales: bool = True,
+                      incremento: str = None):
         """
         Regresa un DataFrame con el último dato de los indicadores proporcionados por la API de Banxico.
         
@@ -100,6 +118,11 @@ class Banxico:
         -----------
         indicadores: str/list. Calve(s) de los indicadores a consultar. Puede ser hasta un máximo de 20 indicadores a la vez.
         nombres: list/str, opcional. Nombre(s) de las columas del DataFrame. De no proporcionarse, se usarán los indicadores.
+        decimales: bool. En caso de ser verdadero regresa la serie con todos los decimales. Si es falso elimina los ceros decimales al final del punto decimal (los menos significativos).
+        incremento: str, opcional. En caso de definir alguna de las opciones regresa la serie como el incremento porcentual de alguna observación previa. Las opciones disponibles son las siguientes:
+                            * PorcObsAnt: Porcentaje de incremento con respecto a la observación anterior.
+                            * PorcAnual: Porcentaje de incremento con respecto a la misma observación del año anterior.
+                            * PorcAcumAnual: Porcentaje de incremento con respecto a la última observación del año anterior.
         ----------
 
         El DataFrame resultante tiene una columna por cada indicador y un DateTimeIndex con la fecha de los valores. 
@@ -112,6 +135,8 @@ class Banxico:
         else: self._columnas = indicadores
         
         if isinstance(self._columnas, str): self._columnas = [self._columnas]
-        data = self.__generar_consulta('datos/oportuno')
+        
+        params = self.__parametros(decimales, incremento)
+        data = self.__generar_consulta('datos/oportuno', params)
         return self.__json_a_df(data)
 

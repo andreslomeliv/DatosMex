@@ -11,7 +11,7 @@ VERSION = '1.0.0'
 
 # librerías requeridas
 REQUIRED = [
-		'requests','pandas','matplotlib','seaborn'
+		'requests','pandas'
 		]
 
 setup(
