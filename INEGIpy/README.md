@@ -4,7 +4,7 @@ INEGIpy es una librería para interactuar fácilmente con los datos del Institut
 
 De la información que ofrece el INEGI actualmente se cuenta con una clase dedicada al [Banco de Indicadores](https://www.inegi.org.mx/servicios/api_indicadores.html), otra dedicada al [DENUE](https://www.inegi.org.mx/servicios/api_denue.html), otra a la información del [Marco Geoestadístico](https://www.inegi.org.mx/servicios/catalogoUnico.html) y finalmente una dedicada al [Sistema de Ruteo de México](https://www.inegi.org.mx/servicios/Ruteo/Default.html). 
 
-También se encuentra en constrcción un módulo de Series dedicado a consultas automatizadas de los principales indicadores económicos como el PIB, INPC, Ocupación, etc. 
+También se encuentra en construcción un módulo de Series dedicado a consultas automatizadas de los principales indicadores económicos como el PIB, INPC, Ocupación, etc. 
 
 ## Principales características
 
