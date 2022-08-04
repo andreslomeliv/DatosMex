@@ -1,6 +1,7 @@
 import requests
 import json
 import pandas as pd
+import re
 
 class Banxico:
     def __init__(self, token):
@@ -10,7 +11,6 @@ class Banxico:
         self._columnas = list()
         
     def __generar_consulta(self, consulta, params):
-        if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
         indicadores = ','.join(self._indicadores)
         url = '{}/{}/{}'.format(self.__liga_base, indicadores, consulta)
         req = requests.get(url ,params=params)
@@ -26,11 +26,13 @@ class Banxico:
                     df = pd.DataFrame(d['datos'])
                     df.index = pd.to_datetime(df.fecha,format='%d/%m/%Y')
                     df = df.drop(['fecha'],axis=1)
+                    df['dato'] = df['dato'].str.replace(',', '')
                     df['dato'] = df['dato'].str.replace('N/E', 'NaN').astype(float)
                     dfs.append(df)
 
             df = pd.concat(dfs, axis=1)  
-            df.columns = self._columnas
+            try: df.columns = self._columnas
+            except: raise Exception('El número de columnas no coincide con el número de indicadores')
         return df
     
     def __parametros(self, decimales, incremento):
@@ -42,6 +44,19 @@ class Banxico:
                 raise Exception('El incremento debe ser alguna da las siguientes opciones: {}'.format(opciones))
             params['incremento'] = incremento
         return params
+
+    def __definir_valores(self, indicadores, nombres):
+        self._indicadores = indicadores
+        if nombres is not None: self._columnas = nombres
+        elif re.match('.+-.+', indicadores): 
+            s,f = re.findall("SF(\d)", indicadores)
+            s,f = int(s), int(f)
+            self._columnas = ['SF{}'.format(i) for i in range(s,f+1)]
+        else: self._columnas = indicadores  
+        
+        if isinstance(self._columnas, str): self._columnas = [self._columnas]
+        if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
+
 
     def obtener_series(self, 
                        indicadores: 'str|list', 
@@ -73,12 +88,7 @@ class Banxico:
         Para más información visitar https://www.banxico.org.mx/SieAPIRest/service/v1/doc/catalogoSeries#
 
         """
-        self._indicadores = indicadores
-        if nombres: self._columnas = nombres
-        else: self._columnas = indicadores
-        
-        if isinstance(self._columnas, str): self._columnas = [self._columnas]
-        
+        self.__definir_valores(indicadores, nombres)
         params = self.__parametros(decimales, incremento)
         data = self.__generar_consulta('datos', params)
         df = self.__json_a_df(data)
@@ -99,7 +109,7 @@ class Banxico:
         Para más información visitar https://www.banxico.org.mx/SieAPIRest/service/v1/doc/catalogoSeries#
 
         """
-        self._indicadores = indicadores
+        self.__definir_valores(indicadores, None)
         params = self.__parametros(True, None)
         data = self.__generar_consulta('', params)
         return self.__json_a_df(data, metadatos = True)
@@ -130,12 +140,7 @@ class Banxico:
         Para más información visitar https://www.banxico.org.mx/SieAPIRest/service/v1/doc/catalogoSeries#
 
         """
-        self._indicadores = indicadores
-        if nombres: self._columnas = nombres
-        else: self._columnas = indicadores
-        
-        if isinstance(self._columnas, str): self._columnas = [self._columnas]
-        
+        self.__definir_valores(indicadores, nombres)
         params = self.__parametros(decimales, incremento)
         data = self.__generar_consulta('datos/oportuno', params)
         return self.__json_a_df(data)
