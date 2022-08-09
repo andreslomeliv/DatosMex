@@ -33,12 +33,12 @@ La clase ```Banxico``` contiene los métodos y atributos relacionados a la API d
 #### obtener_serie()
 
 ```python
-Banxico.obtener_df(indicadores, 
-                   nombres = None, 
-                   inicio = None, 
-                   fin = None,
-                   decimales = True,
-                   incremento = None)
+Banxico.obtener_serie(indicadores, 
+                      nombres = None, 
+                      inicio = None, 
+                      fin = None,
+                      decimales = True,
+                      incremento = None)
 ```
 **Parámetros**
 * **indicadores:** str/list. Clave(s) de los indicadores a consultar. Puede ser hasta un máximo de 20 indicadores a la vez. Las claves de los indicadores se pueden enviar individualmente, como una lista o en un rango (ej. "SF1-SF5").
