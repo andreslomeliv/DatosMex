@@ -1403,7 +1403,7 @@ DENUE.BuscarAreaActEstr(nombre,
                         as_geodf = True)
 ```
 **Parámetros**
-* **nombre:** str. Nombre del establecimiento a buscar.
+* **nombre:** str. Nombre del establecimiento a buscar. Para incluir todos los establecimientos se especifica 0.
 * **clave_area**: str. Clave de dos a dieciseis caracteres que indentifica el área geográfica de acuerdo con el Marco Geoestadístico. En caso de no definir una clave se regresan todos los establecimientos del país.
                                     Dos caracteres para definir un estado (ej. 01 a 32).
                                     Cinco caracteres dígitos para definir un municipio (ej. 01001).
