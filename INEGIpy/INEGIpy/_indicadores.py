@@ -96,8 +96,31 @@ class Indicadores:
 
         # construcción de la serie
         obs_totales = len(serie)
-        dic = {'fechas':[serie[i]['TIME_PERIOD'] for i in range(obs_totales)],
-                'valor':[float(serie[i]['OBS_VALUE']) if serie[i]['OBS_VALUE'] is not None else nan for i in range(obs_totales)]}
+        dic = {
+            'fechas': [serie[i]['TIME_PERIOD'] for i in range(obs_totales)],
+            'valor': [
+                float(serie[i]['OBS_VALUE']) if serie[i]['OBS_VALUE'] not in (None, '') else nan
+                for i in range(obs_totales)
+            ]
+        }
+
+        """
+        Se modificó el diccionario 'dic' en la clave 'valor':
+
+        Antes:
+            'valor': [float(serie[i]['OBS_VALUE']) if serie[i]['OBS_VALUE'] is not None else nan for i in range(obs_totales)]
+
+        Este código ocasionaba un error en consultas a DENUE donde el dato existía pero estaba en formato string vacío: ''.
+
+        Corrección:
+            'valor': [
+                float(serie[i]['OBS_VALUE']) if serie[i]['OBS_VALUE'] not in (None, '') else nan
+                for i in range(obs_totales)
+            ]
+
+        Esta modificación evita el error al convertir cadenas vacías a float, permitiendo exportar valores nulos como nan y dejando al usuario la validación de la información.
+        """
+
         df = pd.DataFrame.from_dict(dic)
         frecuencia = data['FREQ']
         factor, period = self.__frecuancias_dict[banco].get(frecuencia) # factor que multiplica el periodo para pasar a fecha y periodo de pd
