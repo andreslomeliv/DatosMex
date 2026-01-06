@@ -5,193 +5,86 @@ import warnings
 from numpy import nan
 
 class Indicadores:
-    
+
     def __init__(self, token):
-        self.__token = token # token proporcionado por el INEGI único para cada usuario
-        self.__liga = 'https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/' 
-        self.__liga_base = self.__liga + 'INDICATOR/' #base de los indicadores
-        # vriables para la consulta
-        self._indicadores = list() # lista con los indicadores a consultar. cada módulo la llena con sus especificaciones
-        self._bancos = list() # lista con los bancos de los indicadores
-        self._columnas = list() # nombres de las columnas. En los módulos de series se llena automáticamente.
-        # diccionario con la clave de frecuencia del INEGI y el factor por el cual se debe multiplicar
-        # el último valor para pasarlo a su mes correspondiente
-        # Ejemplo: una serie semestral tiene como clave de frecuencia '4', esto indica que para cada año van
-        # a haber dos periodos indicando los dos semestres: "2020/01, 2020/02"
-        # El factor del diccionario indicaría que al último dígito lo multiplicamos por 6 para pasarlo a meses
-        # las claves que no se encuentran en el diccionario son irregulares y no se van a operar
-        self.__frecuancias_dict = {'BIE': {'1':(1,'Y'), '2':(1,'Y'), '3':(1,'Y'), '4':(6,'M'), '5':(4,'M'), '6':(3,'Q'), 
-                                           '7':(2,'M'), '8':(1,'M'), '9':(14,'SM')},
-                                    'BISE': {'1':(1,'Y'), '3':(1,'Y'), '4':(3,'Q'), '7':(1,'Y'), '8':(1,'M'), '9':(1,'Y'), '16':(1,'Y')}}
-        self.__clave_entidad = None
-        
-############## Obtener Data Frame ########################
+        self.token = token
+        self.base_url = "https://www.inegi.org.mx/app/api/indicadores/desarrolladores/jsonxml/"
 
-# Se definen  los métodos internos y públicos necesarios para obtener la serie y pasarla a un DataFrame
-# Las dos variables esenciales para esto son self._indicadores y self._bancos. Cada módulo debe contar con métodos
-# o atributos que permitan definir estas variables. También todas las variables de consulta deben ser accesibles tanto 
-# dentro de las funciones obtener_df() y grafica() como parámetros así como atributos de la clase. 
+        # Rangos de catálogo para determinar banco
+        self.BIE_min = 656
+        self.BIE_max = 1802018
 
-    # aquí falta un control de errores cuando no se pudo obtener la info y advirtiendo que se cheque bien el token
-    def __request(self, liga_api):
-        req = requests.get(liga_api)
-        assert req.status_code == 200, 'No se encontró información con las parámetros especificados.'
-        data = json.loads(req.text)
-        return data
+        self.BISE_min = 472979
+        self.BISE_max = 8999999735
 
-    def __obtener_banco(self, indicador):
-        if int(indicador) <= 698680: 
-            return 'BIE'
-        else: 
-            return 'BISE'
+    # ---------------------------------------------------------
+    # Determinar banco (BIE o BISE) por rango numérico
+    # ---------------------------------------------------------
+    def _saber_fuente(self, indicador: str) -> str:
+        indicador_int = int(indicador)
 
+        if self.BIE_min <= indicador_int <= self.BIE_max:
+            return "BIE"
 
-    def __obtener_json(self, indicador, banco):
-        """ 
-    
-        Construye la liga de consulta y obtiene la información resultante del API del
-        INEGI. 
-        
-        Parámetros:
-        ------------
-        
-        indicador: str.  Número del indicador a buscar.
-       -------------
-    
-        Regresa un diccionario con la información del indicador proporcionada por el API
-        del INEGI en formato JSON. 
-    
-        Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
-    
-        """
-        if banco is None: 
-            if indicador in ['539260', '539261', '539262']: 
-                raise Exception("Para los indicadores '539260', '539261' y '539262' es necesario definir el banco ya que existen tanto para el BIE como para el BISE")
-            else: banco = self.__obtener_banco(indicador)
-        liga_api = '{}{}/es/{}/false/{}/2.0/{}?type=json'.format(self.__liga_base, indicador,  self.__clave_entidad, banco, str(self.__token))
-        data = self.__request(liga_api)
+        if self.BISE_min <= indicador_int <= self.BISE_max:
+            return "BISE"
 
-        return data['Series'][0], banco
-    
-    def __json_a_df(self, data, banco):
-        """ 
-        
-        Construye un DataFrame con la información resultante del API del INEGI de 
-        un solo indicador a la vez.
-    
-        Parámetros:
-        -----------
-        data: Dict. JSON obtendio del API del INEGI.
-        banco: str. Banco de información donde se encuentra el indocador. Puede ser 
-                    'BIE' o 'BISE'.
-        -----------
-        
-        Regresa un objeto tipo DataFrame con la información del indicador proporcionada por el API
-        del INEGI en formato JSON. 
-    
-        Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
-    
-        """
-        serie = data.pop('OBSERVATIONS') #con esto se separa la serie real de los metadatos
+        raise ValueError(f"⚠️ El indicador {indicador} no aparece ni en BIE ni en BISE.")
 
-        # construcción de la serie
-        obs_totales = len(serie)
-        dic = {
-            'fechas': [serie[i]['TIME_PERIOD'] for i in range(obs_totales)],
-            'valor': [
-                float(serie[i]['OBS_VALUE']) if serie[i]['OBS_VALUE'] not in (None, '') else nan
-                for i in range(obs_totales)
-            ]
+    # ---------------------------------------------------------
+    # Request genérico a la API
+    # ---------------------------------------------------------
+    def _request(self, url: str) -> dict:
+        req = requests.get(url)
+        if req.status_code != 200:
+            raise Exception(
+                f"⚠️ Error INEGI {req.status_code}\nURL: {url}\nRespuesta:\n{req.text}"
+            )
+        return json.loads(req.text)
+
+    # ---------------------------------------------------------
+    # JSON de serie → DataFrame de valores
+    # ---------------------------------------------------------
+    def _json_a_df(self, serie_json: dict) -> pd.DataFrame:
+        serie = serie_json["OBSERVATIONS"]
+
+        fechas = [obs["TIME_PERIOD"] for obs in serie]
+        valores = [
+            float(obs["OBS_VALUE"]) if obs["OBS_VALUE"] is not None else nan
+            for obs in serie
+        ]
+
+        df = pd.DataFrame({"fechas": fechas, "valor": valores})
+        df["fechas"] = pd.to_datetime(df["fechas"], errors="coerce")
+        df = df.set_index("fechas")
+
+        return df
+
+    # ---------------------------------------------------------
+    # JSON de serie → DataFrame de metadatos
+    # ---------------------------------------------------------
+    def _json_a_meta(self, serie_json: dict, nombre_columna: str, banco: str) -> pd.DataFrame:
+        meta = {
+            "INDICADOR": serie_json.get("INDICADOR"),
+            "FREQ": serie_json.get("FREQ"),
+            "TOPIC": serie_json.get("TOPIC"),
+            "UNIT": serie_json.get("UNIT"),
+            "UNIT_MULT": serie_json.get("UNIT_MULT"),
+            "NOTE": serie_json.get("NOTE"),
+            "SOURCE": serie_json.get("SOURCE"),
+            "LASTUPDATE": serie_json.get("LASTUPDATE"),
+            "STATUS": serie_json.get("STATUS"),
+            "BANCO": banco,
         }
 
-        """
-        Se modificó el diccionario 'dic' en la clave 'valor':
+        meta_df = pd.DataFrame.from_dict(meta, orient="index", columns=[nombre_columna])
+        return meta_df
 
-        Antes:
-            'valor': [float(serie[i]['OBS_VALUE']) if serie[i]['OBS_VALUE'] is not None else nan for i in range(obs_totales)]
-
-        Este código ocasionaba un error en consultas a DENUE donde el dato existía pero estaba en formato string vacío: ''.
-
-        Corrección:
-            'valor': [
-                float(serie[i]['OBS_VALUE']) if serie[i]['OBS_VALUE'] not in (None, '') else nan
-                for i in range(obs_totales)
-            ]
-
-        Esta modificación evita el error al convertir cadenas vacías a float, permitiendo exportar valores nulos como nan y dejando al usuario la validación de la información.
-        """
-
-        df = pd.DataFrame.from_dict(dic)
-        frecuencia = data['FREQ']
-        factor, period = self.__frecuancias_dict[banco].get(frecuencia) # factor que multiplica el periodo para pasar a fecha y periodo de pd
-        if factor: 
-            try: 
-                cambio_fechas = lambda x: '/'.join(x.split('/')[:-1] + [str(int(x.split('/')[-1])*factor)])
-                df.fechas = df.fechas.apply(cambio_fechas)
-                df.set_index(pd.to_datetime(df.fechas),inplace=True, drop=True)
-                df = df.drop(['fechas'],axis=1)
-                if period == 'SM': df.index = df.index + pd.offsets.SemiMonthBegin()
-            except: 
-                df.fechas = dic['fechas']
-                df.set_index(df.fechas,inplace=True, drop=True)
-                df = df.drop(['fechas'],axis=1)
-                warnings.warn('No se pudo interpretar la fecha correctamente por lo que el índice no es tipo DateTime')
-        else:
-            df.set_index(df.fechas,inplace=True, drop=True)
-            df = df.drop(['fechas'],axis=1)
-            warnings.warn('No se pudo interpretar la fecha correctamente por lo que el índice no es tipo DateTime')
-
-        # construcción de metadatos
-        data['BANCO'] = banco
-        meta = pd.DataFrame.from_dict(data, orient='index', columns=['valor'])
-            
-        return df, meta
-
-    def __definir_cve_ent(self, entidad):
-        cve_base = '0700'
-        if entidad == '00': 
-            self.__clave_entidad = cve_base
-            return
-        if len(entidad[2:5]) == 0: self.__clave_entidad = '{}00{}'.format(cve_base, entidad[:2])
-        else: self.__clave_entidad = '{}00{}0{}'.format(cve_base, entidad[:2], entidad[2:5])
-
-    def _consulta(self, inicio, fin, banco, metadatos):
-        
-        if isinstance(self._indicadores, str): self._indicadores = [self._indicadores]
-        if isinstance(self._bancos, str): self._bancos = [self._bancos]
-        if isinstance(self._columnas, str): self._columnas = [self._columnas]
-        
-        lista_df = list()
-        meta_dfs = list()
-        for i in range(len(self._indicadores)):
-            indicador = self._indicadores[i]
-            data, banco = self.__obtener_json(indicador, banco)
-            df, meta = self.__json_a_df(data, banco)
-            if banco == 'BIE': df = df[::-1]
-            lista_df.append(df)
-            meta_dfs.append(meta)
-
-        df = pd.concat(lista_df,axis=1)
-        meta = pd.concat(meta_dfs, axis=1)
-        try: 
-            df.columns = self._columnas
-            meta.columns = self._columnas
-        except: 
-            warnings.warn('Los nombres no coinciden con el número de indicadores')
-            df.columns = self._indicadores
-            meta.columns = self._indicadores
-
-        if metadatos is False: return df[inicio:fin] 
-        else: return df[inicio:fin], meta
-        
-    def obtener_df(self, 
-                   indicadores: 'str|list', 
-                   nombres: 'str|list' = None, 
-                   clave_area: str = '00',
-                   inicio: str = None, 
-                   fin: str = None, 
-                   banco: str = None, 
-                   metadatos: bool = False):
+    # ---------------------------------------------------------
+    # CONSULTA PRINCIPAL
+    # ---------------------------------------------------------
+    def obtener_df(self, indicadores, nombres=None, clave_area="00",
+                   inicio=None, fin=None, metadatos=False):
         """
         Regresa un DataFrame con la información de los indicadores proporcionada por el API del INEGI. Si metadatos = True regresa un segundo DataFrame con las claves de los metadatos del indicador. 
 
@@ -213,26 +106,86 @@ class Indicadores:
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
 
         """     
-        self._indicadores = indicadores
-        self._columnas = indicadores
-        if nombres is not None: 
-            self._columnas = nombres
-        self.__definir_cve_ent(clave_area)
-        return self._consulta(inicio, fin, banco, metadatos)
 
+        
+        if isinstance(indicadores, str):
+            indicadores = [indicadores]
 
+        if nombres is None:
+            nombres = indicadores
 
-## Catalogo de Metadatos
+        if isinstance(nombres, str):
+            nombres = [nombres]
 
-    def _consultar_catalogo(self, clave, id, banco):
-        liga = '{}{}/{}/es/{}/2.0/{}/?type=json'.format(self.__liga, clave, id, banco, self.__token)
-        req = requests.get(liga)
-        data = json.loads(req.text)
-        return pd.DataFrame(data['CODE'])
+        dfs = []
+        metas = []
 
-    def catalogo_indicadores(self, 
-                             banco: str, 
-                             indicador: str = None):
+        for ind, nombre in zip(indicadores, nombres):
+            ind = str(ind)
+
+            banco = self._saber_fuente(ind)
+
+            url = (
+                f"{self.base_url}INDICATOR/{ind}/es/{clave_area}/false/"
+                f"{banco}/2.0/{self.token}?type=json"
+            )
+
+            data_json = self._request(url)
+            serie_json = data_json["Series"][0]
+
+            # Serie de valores
+            df_ind = self._json_a_df(serie_json)
+            df_ind.columns = [nombre]
+
+            dfs.append(df_ind)
+
+            # Metadatos
+            if metadatos:
+                meta_df = self._json_a_meta(serie_json, nombre, banco)
+                metas.append(meta_df)
+
+        # Unir indicadores por fechas
+        df_final = pd.concat(dfs, axis=1)
+
+        
+        if inicio:
+            df_final = df_final[df_final.index >= pd.to_datetime(inicio)]
+        if fin:
+            df_final = df_final[df_final.index <= pd.to_datetime(fin)]
+
+        if metadatos:
+            meta_final = pd.concat(metas, axis=1)
+            return df_final, meta_final
+
+        return df_final
+
+    # =========================================================
+    # ========   C A T Á L O G O S   D E   C Ó D I G O S  ======
+    # =========================================================
+    def _consultar_catalogo(self, clave: str, id_code: str, banco_api: str) -> pd.DataFrame:
+        """
+        clave: 'CL_INDICATOR', 'CL_FREQ', 'CL_TOPIC', etc.
+        id_code: código específico o 'null'
+        banco_api:
+          - 'BIE-BISE' para catálogos del BIE
+          - 'BISE' para catálogos del BISE
+        """
+        url = (
+            f"{self.base_url}{clave}/{id_code}/es//{banco_api}/2.0/"
+            f"{self.token}?type=json"
+        )
+
+        data = self._request(url)
+
+        
+        if "Data" in data:
+            return pd.DataFrame(data["Data"])
+        elif "CODE" in data:
+            return pd.DataFrame(data["CODE"])
+        else:
+            return pd.DataFrame()
+
+    def catalogo_indicadores(self, banco: str, indicador: str = None) -> pd.DataFrame:
         '''
         Regresa un DataFrame con la descripción de algunos o todos los indicadores de un banco. 
 
@@ -245,11 +198,24 @@ class Indicadores:
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
 
         '''
-        if indicador is None: indicador = 'null'
-        return self._consultar_catalogo('CL_INDICATOR', indicador, banco)
+        banco = banco.upper()
 
-    def consulta_metadatos(self, 
-                           metadatos: 'DataFrame|dict'):
+        if banco == "BIE":
+            banco_api = "BIE-BISE"
+        elif banco == "BISE":
+            banco_api = "BISE"
+        else:
+            raise ValueError("banco debe ser 'BIE' o 'BISE'.")
+
+        id_code = "null" if indicador is None else str(indicador)
+
+        df_cat = self._consultar_catalogo("CL_INDICATOR", id_code, banco_api)
+        return df_cat
+
+    # ---------------------------------------------------------
+    # Metadatos con descripciones
+    # ---------------------------------------------------------
+    def consulta_metadatos(self, metadatos: pd.DataFrame) -> pd.DataFrame:
         '''
         Regresa un DataFrame con la descripción de los metadatos de una o más series. 
 
@@ -259,21 +225,43 @@ class Indicadores:
         ----------
         
         Para más información visitar https://www.inegi.org.mx/servicios/api_indicadores.html
-
         '''
-        if isinstance(metadatos, dict): metadatos = pd.DataFrame.from_dict(dict)
-        n_df = metadatos.copy(deep=True)
-        for col in metadatos.columns:
-            banco = metadatos.loc['BANCO',col]
-            for idx in metadatos.index: 
-                if idx in ['LASTUPDATE','BANCO']: continue
-                id = metadatos.loc[idx,col]
-                if id is None or len(id) == 0: continue
-                if idx == 'INDICADOR': clave = 'CL_INDICATOR'
-                else: clave = 'CL_{}'.format(idx)
-                try:
-                    desc = self._consultar_catalogo(clave, id, banco)
-                    n_df.loc[idx,col] = desc.iloc[0,1]
-                except: n_df.loc[idx,col] = 'No hay información'
+            
+        if isinstance(metadatos, dict):
+            meta_df = pd.DataFrame(metadatos)
+        else:
+            meta_df = metadatos.copy()
 
-        return n_df
+        meta_desc = meta_df.copy()
+
+        for col in meta_df.columns:
+            banco = meta_df.loc["BANCO", col]
+
+            # Elegir banco_api para catálogos
+            banco_api = "BIE-BISE" if banco == "BIE" else "BISE"
+
+            for idx in meta_df.index:
+                if idx in ["LASTUPDATE", "BANCO", "STATUS", "NOTE"]:
+                    continue
+
+                code = meta_df.loc[idx, col]
+                if code is None or str(code).strip() == "":
+                    continue
+
+                if idx == "INDICADOR":
+                    clave = "CL_INDICATOR"
+                else:
+                    clave = f"CL_{idx}"
+
+                try:
+                    cat = self._consultar_catalogo(clave, str(code), banco_api)
+                    if not cat.empty:
+                        # Buscar columna tipo Description
+                        desc_cols = [c for c in cat.columns if c.lower().startswith("desc")]
+                        if desc_cols:
+                            meta_desc.loc[idx, col] = cat.iloc[0][desc_cols[0]]
+                except Exception:
+                    
+                    pass
+
+        return meta_desc
