@@ -6,7 +6,7 @@ from shapely.geometry import Point
 
 class DENUE:
     def __init__(self, token):
-        self.__token = token
+        self.token = token
         self.__liga_base = 'https://www.inegi.org.mx/app/api/denue/v1/consulta/'
     
     # realiza las transformaciones necesarias para hacer iun geodataframe
@@ -36,7 +36,7 @@ class DENUE:
         return df
         
     def Buscar(self, 
-               condiciones: 'str|lsit', 
+               condiciones: 'str|list', 
                latitud: float, 
                longitud: float, 
                distancia: int, 

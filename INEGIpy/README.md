@@ -31,6 +31,23 @@ La instalación de GeoPandas puede ser un poco complicada de manejar por lo que 
 
 ```pip install INEGIpy```
 
+## Cambios recientes
+
+### Versión 2.0.0 — Actualización por cambios en la API de INEGI
+
+Esta versión adapta la librería a las modificaciones recientes realizadas por INEGI en su API, con el objetivo de mantener la compatibilidad y el funcionamiento correcto de las consultas.
+
+#### Cambios principales
+
+* Se actualizó la integración para alinearse con la nueva estructura y comportamiento de la API de INEGI.
+* El parámetro banco ya no es necesario para realizar consultas.
+
+#### Compatibilidad hacia atrás
+
+* El parámetro banco se mantiene en las funciones únicamente por compatibilidad con versiones anteriores.
+* Actualmente no tiene ningún efecto en el comportamiento de la librería.
+* Se recomienda dejar de usar el parámetro banco, ya que podría eliminarse en versiones posteriores.
+
 ## Documentación
 
 * [Indicadores](#Indicadores)
