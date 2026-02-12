@@ -11,7 +11,7 @@ DESCRIPTION = 'Librería en Python para facilitar el uso de las APIs del INEGI'
 URL = 'https://github.com/andreslomeliv/DatosMex/tree/master/INEGIpy'
 EMAIL = 'andres.lomeli.v@gmail.com'
 AUTHOR = 'Andres Lomelí Viramontes'
-REQUIRES_PYTHON = '>=3.6.0'
+REQUIRES_PYTHON = '>=3.8'
 VERSION = '2.0.0'
 
 # librerías requeridas
@@ -24,6 +24,7 @@ setup(
 	version=VERSION,
 	description=DESCRIPTION,
 	long_description=README,
+    long_description_content_type="text/markdown",
 	author=AUTHOR,
 	author_email=EMAIL,
 	python_requires=REQUIRES_PYTHON,
