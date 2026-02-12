@@ -12,7 +12,7 @@ from shapely.geometry import shape
 
 class Ruteo:
     def __init__(self, token):
-        self.__token = token
+        self.token = token
         self.__liga_base = 'https://gaia.inegi.org.mx/sakbe_v3.1/'
         
     def __obtener_consulta(self, funcion, params, as_geodf = True): # función base para realizar consulta y generar el geodataframe

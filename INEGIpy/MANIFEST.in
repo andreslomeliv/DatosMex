@@ -2,3 +2,4 @@ exclude README.ipynb
 exclude README.md
 recursive-exclude README_PNGs *
 include long_desc.md
+include INEGIpy/data/catalogo_bie.txt

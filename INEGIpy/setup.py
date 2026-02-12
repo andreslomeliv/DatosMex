@@ -12,7 +12,7 @@ URL = 'https://github.com/andreslomeliv/DatosMex/tree/master/INEGIpy'
 EMAIL = 'andres.lomeli.v@gmail.com'
 AUTHOR = 'Andres Lomelí Viramontes'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '1.2.1'
+VERSION = '2.0.0'
 
 # librerías requeridas
 REQUIRED = [
@@ -30,5 +30,6 @@ setup(
 	url=URL,
 	packages=['INEGIpy'],
 	install_requires=REQUIRED,
-	license='MIT'
+	license='MIT',
+    include_package_data=True,
 )

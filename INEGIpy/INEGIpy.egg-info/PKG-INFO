@@ -1,6 +1,6 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: INEGIpy
-Version: 1.2.1
+Version: 2.0.0
 Summary: Librería en Python para facilitar el uso de las APIs del INEGI
 Home-page: https://github.com/andreslomeliv/DatosMex/tree/master/INEGIpy
 Author: Andres Lomelí Viramontes
@@ -8,6 +8,20 @@ Author-email: andres.lomeli.v@gmail.com
 License: MIT
 Requires-Python: >=3.6.0
 License-File: LICENSE
+Requires-Dist: requests
+Requires-Dist: pandas
+Requires-Dist: numpy
+Requires-Dist: geopandas
+Requires-Dist: shapely
+Dynamic: author
+Dynamic: author-email
+Dynamic: description
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
 
 INEGIpy es una librería para interactuar fácilmente con los datos del Instituto Nacional de Geografía y Estadística (INEGI) desde Python. Su propósito es apoyar en la creación de consultas automatizadas y  en el acceso a la información para el análisis de datos. 
 

@@ -3,4 +3,4 @@ from ._denue import DENUE
 from ._marco_geoestadistico import MarcoGeoestadistico
 from ._ruteo import Ruteo
 
-__version__ = "1.2.1"
+__version__ = "2.0.0"
