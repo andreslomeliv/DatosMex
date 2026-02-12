@@ -13,3 +13,4 @@ INEGIpy.egg-info/dependency_links.txt
 INEGIpy.egg-info/requires.txt
 INEGIpy.egg-info/top_level.txt
 INEGIpy/data/catalogo_bie.txt
+tests/tests_indicadores.py
