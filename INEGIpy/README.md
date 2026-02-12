@@ -114,11 +114,15 @@ Indicadores.obtener_df(indicadores,
                                     Cinco dígitos dígitos para incluir nivel municipal (ej. 01001).
 * **inicio:** str. Fecha donde iniciar la serie en formato YYYY(-MM-DD). De no proporcionarse será desde el primer valor disponible. 
 * **fin:** str. Fecha donde terminar la serie en formato YYYY(-MM-DD). De no proporcionarse será hasta el último valor disponible.
-* **banco:** str, opcional. ['BIE' | 'BISE'] Define el banco al cual pertenecen los indicadores. Puede ser el Banco de Indicadores Económicos (BISE) o el Banco de Información Económica (BIE). Ya que solamente tres claves de indicadores se encuentran en ambos bancos y el resto son diferentes, no es necesario definir este parámetro a menos que los indicadores a consultar sea alguno de los siguientes: ['539260', '539261', '539262'].
+* **banco:** str, opcional. Deprecado. ['BIE' | 'BISE'] Define el banco al cual pertenecen los indicadores. Puede ser el Banco de Indicadores Económicos (BISE) o el Banco de Información Económica (BIE).
 * **metadatos:** bool. En caso se ser verdadero regresa un DataFrame con los metadatos de los indicadores.
 
 Regresa un DataFrame con la información de los indicadores. El DataFrame resultante tiene una columna por cada indicador y un DateTimeIndex con la fecha de los valores. 
 Si ```metadatos = True``` regresa un segundo DataFrame con las claves de los metadatos del indicador. 
+
+**Advertencia (v2.0.0):**
+El parámetro `banco` está deprecado. 
+Se conserva solo por compatibilidad con versiones anteriores y ya no tiene efecto.
 
 ##### consulta_metadatos()
 
