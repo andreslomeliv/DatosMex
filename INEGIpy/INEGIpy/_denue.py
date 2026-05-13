@@ -63,7 +63,7 @@ class DENUE:
         condiciones = [self.__estadarizar_string(s) for s in condiciones] # checar si es necesario estas dos lineas
         condiciones = ','.join(condiciones)
         coordenadas = '{},{}'.format(str(latitud),str(longitud))
-        liga = self.__liga_base + 'Buscar/{}/{}/{}/{}'.format(condiciones, coordenadas, str(distancia), self.__token)
+        liga = self.__liga_base + 'Buscar/{}/{}/{}/{}'.format(condiciones, coordenadas, str(distancia), self.token)
         return self.__obtener_consulta(liga, as_geodf)
         
     
@@ -84,7 +84,7 @@ class DENUE:
         Para más información ir a: https://www.inegi.org.mx/servicios/api_denue.html
         
         '''
-        liga = self.__liga_base + 'Ficha/{}/{}'.format(clave, self.__token)
+        liga = self.__liga_base + 'Ficha/{}/{}'.format(clave, self.token)
         return self.__obtener_consulta(liga, as_geodf)
     
     def Nombre(self, 
@@ -111,7 +111,7 @@ class DENUE:
         
         '''
         nombre = self.__estadarizar_string(nombre)
-        liga = self.__liga_base + 'Nombre/{}/{}/{}/{}/{}'.format(nombre, entidad, str(registro_inicial), str(registro_final), self.__token)
+        liga = self.__liga_base + 'Nombre/{}/{}/{}/{}/{}'.format(nombre, entidad, str(registro_inicial), str(registro_final), self.token)
         return self.__obtener_consulta(liga, as_geodf)
     
     def BuscarEntidad(self, 
@@ -140,7 +140,7 @@ class DENUE:
         if isinstance(condiciones, str): condiciones = [condiciones]
         condiciones = [self.__estadarizar_string(s) for s in condiciones] # checar si es necesario estas dos lineas
         condiciones = ','.join(condiciones)
-        liga = self.__liga_base + 'BuscarEntidad/{}/{}/{}/{}/{}'.format(condiciones, entidad, str(registro_inicial), str(registro_final), self.__token)
+        liga = self.__liga_base + 'BuscarEntidad/{}/{}/{}/{}/{}'.format(condiciones, entidad, str(registro_inicial), str(registro_final), self.token)
         return self.__obtener_consulta(liga, as_geodf)
     
     # sirve para pasar de claves concatenadas de area y actividad económica a su versión separada para la consulta
@@ -216,7 +216,7 @@ class DENUE:
         liga = self.__liga_base + 'BuscarAreaActEstr/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}/{}'.format(cves_area[0],cves_area[1], cves_area[2], cves_area[3], cves_area[4],
                                                                                                           cves_act[0], cves_act[1], cves_act[2], cves_act[3],
                                                                                                           nombre, str(registro_inicial), str(registro_final),
-                                                                                                          clave_establecimiento, estrato, self.__token)
+                                                                                                          clave_establecimiento, estrato, self.token)
         return self.__obtener_consulta(liga, as_geodf)
 
     def Cuantificar(self, 
@@ -259,6 +259,6 @@ class DENUE:
         '''
         if isinstance(clave_actividad, list): clave_actividad = ','.join(clave_actividad)
         if isinstance(clave_area, list): clave_area = ','.join(clave_area)
-        liga = self.__liga_base + 'Cuantificar/{}/{}/{}/{}'.format(clave_actividad, clave_area, estrato, self.__token)
+        liga = self.__liga_base + 'Cuantificar/{}/{}/{}/{}'.format(clave_actividad, clave_area, estrato, self.token)
         return self.__obtener_consulta(liga, False)
         
